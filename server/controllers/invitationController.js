@@ -68,6 +68,7 @@ export function createInvitation(req, res) {
       primary_color,
       secondary_color,
       font_family,
+      is_muslim = 1,
       bride_name,
       bride_parents,
       bride_photo,
@@ -121,15 +122,16 @@ export function createInvitation(req, res) {
 
     db.prepare(`
       INSERT INTO invitation_content (
-        invitation_id, bride_name, bride_parents, bride_photo, bride_instagram,
+        invitation_id, is_muslim, bride_name, bride_parents, bride_photo, bride_instagram,
         groom_name, groom_parents, groom_photo, groom_instagram,
         wedding_date, akad_time, akad_venue, akad_address, akad_lat, akad_lng,
         reception_time, reception_venue, reception_address, reception_lat, reception_lng,
         music_url, story_text, gallery_images, custom_fields,
         gift_bank_accounts, gift_ewallets, gift_address, enable_gift
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       invitationId,
+      is_muslim ? 1 : 0,
       bride_name,
       bride_parents || null,
       bride_photo || null,
@@ -189,6 +191,7 @@ export function updateInvitation(req, res) {
       secondary_color,
       font_family,
       status,
+      is_muslim,
       bride_name,
       bride_parents,
       bride_photo,
@@ -247,6 +250,7 @@ export function updateInvitation(req, res) {
 
     db.prepare(`
       UPDATE invitation_content SET
+        is_muslim = COALESCE(?, is_muslim),
         bride_name = COALESCE(?, bride_name),
         bride_parents = COALESCE(?, bride_parents),
         bride_photo = COALESCE(?, bride_photo),
@@ -276,6 +280,7 @@ export function updateInvitation(req, res) {
         enable_gift = COALESCE(?, enable_gift)
       WHERE invitation_id = ?
     `).run(
+      is_muslim !== undefined ? (is_muslim ? 1 : 0) : null,
       bride_name,
       bride_parents,
       bride_photo,

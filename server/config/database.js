@@ -44,6 +44,7 @@ export function initializeDatabase() {
     CREATE TABLE IF NOT EXISTS invitation_content (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       invitation_id INTEGER NOT NULL UNIQUE,
+      is_muslim INTEGER DEFAULT 1,
       bride_name TEXT NOT NULL,
       bride_parents TEXT,
       bride_photo TEXT,

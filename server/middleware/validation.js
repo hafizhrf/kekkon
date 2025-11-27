@@ -27,12 +27,10 @@ export const validateRegister = [
     .withMessage('Email tidak valid'),
   body('password')
     .isLength({ min: 6, max: 128 })
-    .matches(/^(?=.*[a-zA-Z])(?=.*[0-9])/)
-    .withMessage('Password minimal 6 karakter dan mengandung huruf dan angka'),
+    .withMessage('Password minimal 6 karakter'),
   body('name')
     .optional()
     .trim()
-    .escape()
     .isLength({ max: 100 })
     .withMessage('Nama maksimal 100 karakter'),
 ];
