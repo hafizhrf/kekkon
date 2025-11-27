@@ -67,12 +67,14 @@ export default function InvitationEditor() {
   const [publishing, setPublishing] = useState(false);
   const [publishedSlug, setPublishedSlug] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(null);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
 
   const [formData, setFormData] = useState({
     template_id: 'geometric-modern',
     primary_color: '#D4A373',
     secondary_color: '#FEFAE0',
     font_family: 'playfair',
+    is_muslim: true,
     bride_name: '',
     bride_parents: '',
     bride_photo: '',
@@ -129,6 +131,7 @@ export default function InvitationEditor() {
         primary_color: inv.primary_color || '#D4A373',
         secondary_color: inv.secondary_color || '#FEFAE0',
         font_family: inv.font_family || 'playfair',
+        is_muslim: inv.is_muslim !== undefined ? Boolean(inv.is_muslim) : true,
         bride_name: inv.bride_name || '',
         bride_parents: inv.bride_parents || '',
         bride_photo: inv.bride_photo || '',
@@ -201,6 +204,7 @@ export default function InvitationEditor() {
   };
 
   const handleGalleryUpload = async (files) => {
+    setUploadingGallery(true);
     try {
       const uploads = await Promise.all(files.map(file => uploadAPI.image(file)));
       const urls = uploads.map(res => res.data.url);
@@ -208,6 +212,8 @@ export default function InvitationEditor() {
       toast.success(`${urls.length} foto ditambahkan`);
     } catch (err) {
       toast.error('Gagal upload gambar');
+    } finally {
+      setUploadingGallery(false);
     }
   };
 
@@ -273,10 +279,19 @@ export default function InvitationEditor() {
         >
           <input {...getInputProps()} />
           {isUploading ? (
-            <div className="h-48 flex items-center justify-center">
-              <div className="flex flex-col items-center gap-3">
-                <div className="w-10 h-10 border-3 border-amber-400 border-t-transparent rounded-full animate-spin" />
-                <span className="text-sm text-gray-500">Mengupload...</span>
+            <div className="h-48 flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50">
+              <div className="flex flex-col items-center gap-4">
+                <div className="relative">
+                  <div className="w-16 h-16 rounded-full border-4 border-amber-100" />
+                  <div className="absolute inset-0 w-16 h-16 rounded-full border-4 border-amber-500 border-t-transparent animate-spin" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Upload className="w-6 h-6 text-amber-500" />
+                  </div>
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-medium text-amber-700">Mengupload foto...</p>
+                  <p className="text-xs text-amber-500 mt-1">Mohon tunggu sebentar</p>
+                </div>
               </div>
             </div>
           ) : currentImage ? (
@@ -511,6 +526,50 @@ export default function InvitationEditor() {
                         <span className="text-[10px] sm:text-xs mt-1 block opacity-70 truncate">{f.style}</span>
                       </button>
                     ))}
+                  </div>
+                </div>
+
+                {/* Religion Type Toggle */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3 sm:mb-4 flex items-center gap-2">
+                    <Heart className="w-4 h-4 text-rose-500" />
+                    Jenis Undangan
+                  </h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => handleChange('is_muslim', true)}
+                      className={`p-4 sm:p-5 rounded-2xl text-center transition-all duration-300 border-2 ${
+                        formData.is_muslim 
+                          ? 'border-emerald-500 bg-emerald-50 shadow-lg' 
+                          : 'border-gray-200 bg-gray-50 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className="text-2xl sm:text-3xl mb-2">🕌</div>
+                      <span className={`text-sm sm:text-base font-semibold ${formData.is_muslim ? 'text-emerald-700' : 'text-gray-600'}`}>
+                        Muslim
+                      </span>
+                      <p className="text-[10px] sm:text-xs text-gray-500 mt-1">
+                        Dengan Bismillah & nuansa Islami
+                      </p>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleChange('is_muslim', false)}
+                      className={`p-4 sm:p-5 rounded-2xl text-center transition-all duration-300 border-2 ${
+                        !formData.is_muslim 
+                          ? 'border-amber-500 bg-amber-50 shadow-lg' 
+                          : 'border-gray-200 bg-gray-50 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className="text-2xl sm:text-3xl mb-2">💒</div>
+                      <span className={`text-sm sm:text-base font-semibold ${!formData.is_muslim ? 'text-amber-700' : 'text-gray-600'}`}>
+                        Umum
+                      </span>
+                      <p className="text-[10px] sm:text-xs text-gray-500 mt-1">
+                        Bahasa formal tanpa nuansa agama
+                      </p>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -967,17 +1026,27 @@ export default function InvitationEditor() {
                       </div>
                     ))}
                     {formData.gallery_images.length < 10 && (
-                      <label className="h-28 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-amber-400 hover:bg-amber-50/50 transition-all">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          multiple
-                          onChange={(e) => handleGalleryUpload(Array.from(e.target.files))}
-                          className="hidden"
-                        />
-                        <Upload className="w-6 h-6 text-gray-400" />
-                        <span className="text-xs text-gray-400 mt-1">Tambah</span>
-                      </label>
+                      uploadingGallery ? (
+                        <div className="h-28 border-2 border-amber-300 bg-amber-50 rounded-2xl flex flex-col items-center justify-center">
+                          <div className="relative">
+                            <div className="w-10 h-10 rounded-full border-3 border-amber-200" />
+                            <div className="absolute inset-0 w-10 h-10 rounded-full border-3 border-amber-500 border-t-transparent animate-spin" />
+                          </div>
+                          <span className="text-xs text-amber-600 mt-2">Uploading...</span>
+                        </div>
+                      ) : (
+                        <label className="h-28 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-amber-400 hover:bg-amber-50/50 transition-all">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={(e) => handleGalleryUpload(Array.from(e.target.files))}
+                            className="hidden"
+                          />
+                          <Upload className="w-6 h-6 text-gray-400" />
+                          <span className="text-xs text-gray-400 mt-1">Tambah</span>
+                        </label>
+                      )
                     )}
                   </div>
                   <p className="text-xs text-gray-400 mt-3">Max 10 foto, masing-masing max 2MB</p>

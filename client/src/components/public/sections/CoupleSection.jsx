@@ -5,6 +5,7 @@ import { FloralDivider, LeafBranch, FrameBorder, GoldAccent } from '../decoratio
 export default function CoupleSection({ invitation }) {
   const primaryColor = invitation.primary_color || '#D4A373';
   const secondaryColor = invitation.secondary_color || '#FEFAE0';
+  const isMuslim = invitation.is_muslim !== undefined ? Boolean(invitation.is_muslim) : true;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -47,18 +48,29 @@ export default function CoupleSection({ invitation }) {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <motion.p 
-            className="text-2xl md:text-3xl font-great-vibes mb-4"
-            style={{ color: primaryColor }}
-          >
-            Bismillahirrahmanirrahim
-          </motion.p>
+          {isMuslim ? (
+            <motion.p 
+              className="text-2xl md:text-3xl font-great-vibes mb-4"
+              style={{ color: primaryColor }}
+            >
+              Bismillahirrahmanirrahim
+            </motion.p>
+          ) : (
+            <motion.p 
+              className="text-xl md:text-2xl font-great-vibes mb-4"
+              style={{ color: primaryColor }}
+            >
+              Together with our families
+            </motion.p>
+          )}
           
           <GoldAccent className="w-56 mx-auto my-6 opacity-50" />
           
           <p className="text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Dengan memohon rahmat dan ridho Allah SWT, kami bermaksud mengundang Bapak/Ibu/Saudara/i
-            untuk menghadiri acara pernikahan kami:
+            {isMuslim 
+              ? 'Dengan memohon rahmat dan ridho Allah SWT, kami bermaksud mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara pernikahan kami:'
+              : 'Dengan penuh kebahagiaan, kami mengundang Bapak/Ibu/Saudara/i untuk berbagi sukacita dalam perayaan pernikahan kami:'
+            }
           </p>
         </motion.div>
 
@@ -298,18 +310,30 @@ export default function CoupleSection({ invitation }) {
           </motion.div>
         )}
 
-        {/* Quran Verse */}
+        {/* Quote Section - Different for Muslim and Non-Muslim */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="mt-16 text-center"
         >
-          <p className="text-gray-500 text-sm italic max-w-xl mx-auto">
-            "Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu pasangan hidup dari jenismu sendiri, 
-            supaya kamu merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang."
-          </p>
-          <p className="text-gray-400 text-xs mt-3 uppercase tracking-widest">— QS. Ar-Rum: 21</p>
+          {isMuslim ? (
+            <>
+              <p className="text-gray-500 text-sm italic max-w-xl mx-auto">
+                "Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu pasangan hidup dari jenismu sendiri, 
+                supaya kamu merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang."
+              </p>
+              <p className="text-gray-400 text-xs mt-3 uppercase tracking-widest">— QS. Ar-Rum: 21</p>
+            </>
+          ) : (
+            <>
+              <p className="text-gray-500 text-sm italic max-w-xl mx-auto">
+                "Cinta sejati tidak datang dengan mencari pasangan yang sempurna, 
+                tetapi dengan belajar melihat orang yang tidak sempurna dengan cara yang sempurna."
+              </p>
+              <p className="text-gray-400 text-xs mt-3 uppercase tracking-widest">— Sam Keen</p>
+            </>
+          )}
         </motion.div>
       </div>
     </section>

@@ -22,9 +22,11 @@ export default function EventSection({ invitation }) {
     }
   };
 
+  const isMuslim = invitation.is_muslim !== undefined ? Boolean(invitation.is_muslim) : true;
+
   const events = [
     {
-      title: 'Akad Nikah',
+      title: isMuslim ? 'Akad Nikah' : 'Pemberkatan',
       icon: Check,
       time: invitation.akad_time,
       venue: invitation.akad_venue,

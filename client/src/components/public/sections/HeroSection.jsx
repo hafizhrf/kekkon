@@ -82,16 +82,22 @@ export default function HeroSection({ invitation }) {
 
       {/* Main Content */}
       <div className="relative z-10 text-center px-4 py-20 max-w-3xl mx-auto">
-        {/* Bismillah */}
+        {/* Opening Text - Different for Muslim and Non-Muslim */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="mb-6"
         >
-          <p className="text-lg md:text-xl font-great-vibes opacity-70" style={{ color: primaryColor }}>
-            بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم
-          </p>
+          {invitation.is_muslim ? (
+            <p className="text-lg md:text-xl font-great-vibes opacity-70" style={{ color: primaryColor }}>
+              بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم
+            </p>
+          ) : (
+            <p className="text-sm md:text-base text-gray-600 italic max-w-md mx-auto">
+              "Dua hati yang dipersatukan dalam cinta, untuk menjalani kisah indah bersama selamanya"
+            </p>
+          )}
         </motion.div>
 
         {/* The Wedding Of */}
