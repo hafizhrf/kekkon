@@ -141,14 +141,15 @@ export default function CoupleSection({ invitation }) {
                   href={`https://instagram.com/${invitation.bride_instagram.replace('@', '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-all hover:shadow-md"
+                  className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs transition-all hover:shadow-md"
                   style={{ 
                     backgroundColor: `${primaryColor}15`,
                     color: primaryColor 
                   }}
                 >
-                  <Instagram className="w-3 h-3" />
-                  {invitation.bride_instagram}
+                  <Instagram className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                  <span className="hidden sm:inline">{invitation.bride_instagram}</span>
+                  <span className="sm:hidden">IG</span>
                 </a>
               )}
             </div>
@@ -243,14 +244,15 @@ export default function CoupleSection({ invitation }) {
                   href={`https://instagram.com/${invitation.groom_instagram.replace('@', '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-all hover:shadow-md"
+                  className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs transition-all hover:shadow-md"
                   style={{ 
                     backgroundColor: `${primaryColor}15`,
                     color: primaryColor 
                   }}
                 >
-                  <Instagram className="w-3 h-3" />
-                  {invitation.groom_instagram}
+                  <Instagram className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                  <span className="hidden sm:inline">{invitation.groom_instagram}</span>
+                  <span className="sm:hidden">IG</span>
                 </a>
               )}
             </div>

@@ -28,7 +28,7 @@ export function KekkonLogo({ showText = true, size = 'md', linkTo = '/', classNa
     <div className={`flex items-center gap-2 ${className}`}>
       <KekkonIcon size={icon} />
       {showText && (
-        <span className={`font-bold text-amber-700 ${text}`}>KEKKON</span>
+        <span className={`font-bold text-amber-700 ${text}`}>Kekkon</span>
       )}
     </div>
   );

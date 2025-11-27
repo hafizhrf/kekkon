@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useMemo } from 'react';
 
 export function FloralCorner({ className = '', color = '#D4A373', flip = false }) {
   return (
@@ -112,26 +113,42 @@ export function GeometricFrame({ color = '#D4A373', className = '' }) {
 }
 
 export function AnimatedParticles({ color = '#D4A373', count = 20 }) {
+  const particles = useMemo(() => {
+    return [...Array(count)].map((_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      size: 4 + Math.random() * 6,
+      opacity: 0.08 + Math.random() * 0.12,
+      duration: 4 + Math.random() * 3,
+      delay: Math.random() * 3,
+      yOffset: 20 + Math.random() * 20,
+    }));
+  }, [count]);
+
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[...Array(count)].map((_, i) => (
+      {particles.map((p) => (
         <motion.div
-          key={i}
-          className="absolute w-2 h-2 rounded-full"
+          key={p.id}
+          className="absolute rounded-full"
           style={{
             backgroundColor: color,
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            opacity: 0.1 + Math.random() * 0.2,
+            left: `${p.left}%`,
+            top: `${p.top}%`,
+            width: p.size,
+            height: p.size,
           }}
+          initial={{ opacity: p.opacity, y: 0 }}
           animate={{
-            y: [0, -30, 0],
-            opacity: [0.1, 0.3, 0.1],
+            y: [0, -p.yOffset, 0],
+            opacity: [p.opacity, p.opacity + 0.1, p.opacity],
           }}
           transition={{
-            duration: 3 + Math.random() * 2,
+            duration: p.duration,
             repeat: Infinity,
-            delay: Math.random() * 2,
+            ease: 'easeInOut',
+            delay: p.delay,
           }}
         />
       ))}

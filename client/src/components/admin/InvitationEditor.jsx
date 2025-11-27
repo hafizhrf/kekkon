@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight, Upload, X, Check, Eye, Heart, Sparkles, Image, M
 import { useDropzone } from 'react-dropzone';
 import { motion } from 'framer-motion';
 import RichTextEditor from '../shared/RichTextEditor';
+import CustomSelect from '../shared/CustomSelect';
 
 const STEPS = [
   { id: 1, title: 'Template', desc: 'Pilih desain', icon: Palette },
@@ -352,8 +353,29 @@ export default function InvitationEditor() {
       </div>
 
       {/* Progress Steps */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8 overflow-x-auto pb-2">
+      <div className="max-w-6xl mx-auto px-4 py-4 sm:py-8">
+        {/* Mobile Step Indicator */}
+        <div className="sm:hidden mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs text-gray-500">Langkah {step} dari {STEPS.length}</span>
+            <span className="text-xs font-medium text-amber-600">{STEPS[step-1].title}</span>
+          </div>
+          <div className="flex gap-1">
+            {STEPS.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => setStep(s.id)}
+                className={`flex-1 h-1.5 rounded-full transition-all ${
+                  step === s.id ? 'bg-gradient-to-r from-amber-400 to-orange-400' :
+                  step > s.id ? 'bg-green-400' : 'bg-gray-200'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop Step Indicator */}
+        <div className="hidden sm:flex justify-between items-center mb-8 overflow-x-auto pb-2">
           {STEPS.map((s, i) => {
             const Icon = s.icon;
             const isActive = step === s.id;
@@ -362,17 +384,17 @@ export default function InvitationEditor() {
               <div key={s.id} className="flex items-center flex-shrink-0">
                 <button
                   onClick={() => setStep(s.id)}
-                  className={`flex flex-col items-center gap-2 px-4 py-2 rounded-2xl transition-all
+                  className={`flex flex-col items-center gap-2 px-3 md:px-4 py-2 rounded-2xl transition-all
                     ${isActive ? 'bg-gradient-to-br from-amber-400 to-orange-400 text-white shadow-lg shadow-amber-200' : 
                       isCompleted ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 md:gap-2">
                     {isCompleted ? <Check className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
-                    <span className="font-medium text-sm whitespace-nowrap">{s.title}</span>
+                    <span className="font-medium text-xs md:text-sm whitespace-nowrap">{s.title}</span>
                   </div>
                 </button>
                 {i < STEPS.length - 1 && (
-                  <div className={`w-8 h-0.5 mx-1 rounded-full transition-colors ${isCompleted ? 'bg-green-300' : 'bg-gray-200'}`} />
+                  <div className={`w-4 md:w-8 h-0.5 mx-0.5 md:mx-1 rounded-full transition-colors ${isCompleted ? 'bg-green-300' : 'bg-gray-200'}`} />
                 )}
               </div>
             );
@@ -388,26 +410,26 @@ export default function InvitationEditor() {
           className="bg-white rounded-3xl shadow-xl shadow-gray-100/50 overflow-hidden"
         >
           {/* Step Header */}
-          <div className="px-8 py-6 bg-gradient-to-r from-amber-50 to-rose-50 border-b border-amber-100/50">
+          <div className="px-4 sm:px-8 py-4 sm:py-6 bg-gradient-to-r from-amber-50 to-rose-50 border-b border-amber-100/50">
             <div className="flex items-center gap-3">
-              {(() => { const Icon = STEPS[step-1].icon; return <Icon className="w-6 h-6 text-amber-600" />; })()}
+              {(() => { const Icon = STEPS[step-1].icon; return <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />; })()}
               <div>
-                <h2 className="text-xl font-semibold text-gray-800">{STEPS[step-1].title}</h2>
-                <p className="text-sm text-gray-500">{STEPS[step-1].desc}</p>
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-800">{STEPS[step-1].title}</h2>
+                <p className="text-xs sm:text-sm text-gray-500">{STEPS[step-1].desc}</p>
               </div>
             </div>
           </div>
 
-          <div className="p-8">
+          <div className="p-4 sm:p-8">
             {/* Step 1: Template */}
             {step === 1 && (
-              <div className="space-y-10">
+              <div className="space-y-8 sm:space-y-10">
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-4 flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3 sm:mb-4 flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-amber-500" />
                     Pilih Template
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
                     {templates.map((t) => (
                       <button
                         key={t.id}
@@ -445,7 +467,7 @@ export default function InvitationEditor() {
                     <Palette className="w-4 h-4 text-amber-500" />
                     Pilih Warna
                   </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                     {COLOR_PALETTES.map((p) => (
                       <button
                         key={p.name}
@@ -453,17 +475,17 @@ export default function InvitationEditor() {
                           handleChange('primary_color', p.primary);
                           handleChange('secondary_color', p.secondary);
                         }}
-                        className={`flex items-center gap-4 p-4 rounded-2xl transition-all duration-300
+                        className={`flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl sm:rounded-2xl transition-all duration-300
                           ${formData.primary_color === p.primary 
                             ? 'bg-gray-900 text-white shadow-lg' 
                             : 'bg-gray-50 hover:bg-gray-100'}`}
                       >
-                        <div className="flex -space-x-2">
-                          <div className="w-8 h-8 rounded-full ring-2 ring-white shadow" style={{ backgroundColor: p.primary }} />
-                          <div className="w-8 h-8 rounded-full ring-2 ring-white shadow" style={{ backgroundColor: p.secondary }} />
-                          <div className="w-8 h-8 rounded-full ring-2 ring-white shadow" style={{ backgroundColor: p.accent }} />
+                        <div className="flex -space-x-1.5 sm:-space-x-2 flex-shrink-0">
+                          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full ring-2 ring-white shadow" style={{ backgroundColor: p.primary }} />
+                          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full ring-2 ring-white shadow" style={{ backgroundColor: p.secondary }} />
+                          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full ring-2 ring-white shadow" style={{ backgroundColor: p.accent }} />
                         </div>
-                        <span className="text-sm font-medium">{p.name}</span>
+                        <span className="text-xs sm:text-sm font-medium truncate">{p.name}</span>
                       </button>
                     ))}
                   </div>
@@ -474,19 +496,19 @@ export default function InvitationEditor() {
                     <Type className="w-4 h-4 text-amber-500" />
                     Pilih Font
                   </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                  <div className="grid grid-cols-3 xs:grid-cols-5 gap-2 sm:gap-3">
                     {FONTS.map((f) => (
                       <button
                         key={f.id}
                         onClick={() => handleChange('font_family', f.id)}
-                        className={`p-4 rounded-2xl text-center transition-all duration-300
+                        className={`p-2 sm:p-4 rounded-xl sm:rounded-2xl text-center transition-all duration-300
                           ${formData.font_family === f.id 
                             ? 'bg-gradient-to-br from-amber-400 to-orange-400 text-white shadow-lg' 
                             : 'bg-gray-50 hover:bg-gray-100'}`}
                         style={{ fontFamily: f.name }}
                       >
-                        <span className="text-lg font-semibold block">Aa</span>
-                        <span className="text-xs mt-1 block opacity-70">{f.style}</span>
+                        <span className="text-base sm:text-lg font-semibold block">Aa</span>
+                        <span className="text-[10px] sm:text-xs mt-1 block opacity-70 truncate">{f.style}</span>
                       </button>
                     ))}
                   </div>
@@ -496,11 +518,11 @@ export default function InvitationEditor() {
 
             {/* Step 2: Mempelai */}
             {step === 2 && (
-              <div className="grid md:grid-cols-2 gap-10">
+              <div className="grid md:grid-cols-2 gap-6 sm:gap-10">
                 {/* Bride */}
-                <div className="space-y-6">
-                  <div className="flex items-center gap-3 pb-4 border-b border-rose-100">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-400 to-pink-400 flex items-center justify-center">
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="flex items-center gap-3 pb-3 sm:pb-4 border-b border-rose-100">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-rose-400 to-pink-400 flex items-center justify-center flex-shrink-0">
                       <span className="text-white text-lg">♀</span>
                     </div>
                     <div>
@@ -552,9 +574,9 @@ export default function InvitationEditor() {
                 </div>
 
                 {/* Groom */}
-                <div className="space-y-6">
-                  <div className="flex items-center gap-3 pb-4 border-b border-blue-100">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-indigo-400 flex items-center justify-center">
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="flex items-center gap-3 pb-3 sm:pb-4 border-b border-blue-100">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-blue-400 to-indigo-400 flex items-center justify-center flex-shrink-0">
                       <span className="text-white text-lg">♂</span>
                     </div>
                     <div>
@@ -625,55 +647,51 @@ export default function InvitationEditor() {
                     <div className="grid grid-cols-3 gap-3">
                       <div>
                         <label className="block text-xs font-medium text-gray-500 mb-1.5">Tanggal</label>
-                        <select
-                          value={formData.wedding_date ? new Date(formData.wedding_date).getDate() : ''}
-                          onChange={(e) => {
+                        <CustomSelect
+                          label="Pilih Tanggal"
+                          value={formData.wedding_date ? new Date(formData.wedding_date).getDate().toString() : ''}
+                          onChange={(val) => {
                             const current = formData.wedding_date ? new Date(formData.wedding_date) : new Date();
-                            current.setDate(parseInt(e.target.value));
+                            current.setDate(parseInt(val));
                             handleChange('wedding_date', current.toISOString().split('T')[0]);
                           }}
-                          className="w-full px-3 py-3 bg-white border-0 rounded-xl focus:ring-2 focus:ring-amber-400 text-center font-semibold text-lg"
-                        >
-                          <option value="">--</option>
-                          {[...Array(31)].map((_, i) => (
-                            <option key={i + 1} value={i + 1}>{i + 1}</option>
-                          ))}
-                        </select>
+                          options={[...Array(31)].map((_, i) => ({ value: (i + 1).toString(), label: (i + 1).toString() }))}
+                          placeholder="--"
+                          gridCols={5}
+                        />
                       </div>
                       <div>
                         <label className="block text-xs font-medium text-gray-500 mb-1.5">Bulan</label>
-                        <select
-                          value={formData.wedding_date ? new Date(formData.wedding_date).getMonth() : ''}
-                          onChange={(e) => {
+                        <CustomSelect
+                          label="Pilih Bulan"
+                          value={formData.wedding_date ? new Date(formData.wedding_date).getMonth().toString() : ''}
+                          onChange={(val) => {
                             const current = formData.wedding_date ? new Date(formData.wedding_date) : new Date();
-                            current.setMonth(parseInt(e.target.value));
+                            current.setMonth(parseInt(val));
                             handleChange('wedding_date', current.toISOString().split('T')[0]);
                           }}
-                          className="w-full px-3 py-3 bg-white border-0 rounded-xl focus:ring-2 focus:ring-amber-400 text-center font-semibold"
-                        >
-                          <option value="">--</option>
-                          {['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'].map((m, i) => (
-                            <option key={i} value={i}>{m}</option>
-                          ))}
-                        </select>
+                          options={['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'].map((m, i) => ({ value: i.toString(), label: m }))}
+                          placeholder="--"
+                          gridCols={3}
+                        />
                       </div>
                       <div>
                         <label className="block text-xs font-medium text-gray-500 mb-1.5">Tahun</label>
-                        <select
-                          value={formData.wedding_date ? new Date(formData.wedding_date).getFullYear() : ''}
-                          onChange={(e) => {
+                        <CustomSelect
+                          label="Pilih Tahun"
+                          value={formData.wedding_date ? new Date(formData.wedding_date).getFullYear().toString() : ''}
+                          onChange={(val) => {
                             const current = formData.wedding_date ? new Date(formData.wedding_date) : new Date();
-                            current.setFullYear(parseInt(e.target.value));
+                            current.setFullYear(parseInt(val));
                             handleChange('wedding_date', current.toISOString().split('T')[0]);
                           }}
-                          className="w-full px-3 py-3 bg-white border-0 rounded-xl focus:ring-2 focus:ring-amber-400 text-center font-semibold text-lg"
-                        >
-                          <option value="">--</option>
-                          {[...Array(10)].map((_, i) => {
+                          options={[...Array(10)].map((_, i) => {
                             const year = new Date().getFullYear() + i;
-                            return <option key={year} value={year}>{year}</option>;
+                            return { value: year.toString(), label: year.toString() };
                           })}
-                        </select>
+                          placeholder="--"
+                          gridCols={2}
+                        />
                       </div>
                     </div>
                     {formData.wedding_date && (
@@ -702,33 +720,31 @@ export default function InvitationEditor() {
                         <Clock className="w-4 h-4 inline mr-1" />Waktu Acara
                       </label>
                       <div className="flex items-center gap-2">
-                        <select
+                        <CustomSelect
+                          label="Pilih Jam"
                           value={formData.akad_time ? formData.akad_time.split(':')[0] : ''}
-                          onChange={(e) => {
+                          onChange={(val) => {
                             const mins = formData.akad_time ? formData.akad_time.split(':')[1] : '00';
-                            handleChange('akad_time', `${e.target.value}:${mins}`);
+                            handleChange('akad_time', `${val}:${mins}`);
                           }}
-                          className="flex-1 px-4 py-3 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-emerald-400 text-center font-semibold"
-                        >
-                          <option value="">Jam</option>
-                          {[...Array(24)].map((_, i) => (
-                            <option key={i} value={i.toString().padStart(2, '0')}>{i.toString().padStart(2, '0')}</option>
-                          ))}
-                        </select>
+                          options={[...Array(24)].map((_, i) => ({ value: i.toString().padStart(2, '0'), label: i.toString().padStart(2, '0') }))}
+                          placeholder="Jam"
+                          gridCols={4}
+                          className="flex-1"
+                        />
                         <span className="text-2xl font-bold text-gray-400">:</span>
-                        <select
+                        <CustomSelect
+                          label="Pilih Menit"
                           value={formData.akad_time ? formData.akad_time.split(':')[1] : ''}
-                          onChange={(e) => {
+                          onChange={(val) => {
                             const hrs = formData.akad_time ? formData.akad_time.split(':')[0] : '00';
-                            handleChange('akad_time', `${hrs}:${e.target.value}`);
+                            handleChange('akad_time', `${hrs}:${val}`);
                           }}
-                          className="flex-1 px-4 py-3 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-emerald-400 text-center font-semibold"
-                        >
-                          <option value="">Menit</option>
-                          {['00', '15', '30', '45'].map((m) => (
-                            <option key={m} value={m}>{m}</option>
-                          ))}
-                        </select>
+                          options={['00', '15', '30', '45'].map((m) => ({ value: m, label: m }))}
+                          placeholder="Menit"
+                          gridCols={2}
+                          className="flex-1"
+                        />
                         <span className="text-sm text-gray-500 font-medium">WIB</span>
                       </div>
                     </div>
@@ -798,33 +814,31 @@ export default function InvitationEditor() {
                         <Clock className="w-4 h-4 inline mr-1" />Waktu Acara
                       </label>
                       <div className="flex items-center gap-2">
-                        <select
+                        <CustomSelect
+                          label="Pilih Jam"
                           value={formData.reception_time ? formData.reception_time.split(':')[0] : ''}
-                          onChange={(e) => {
+                          onChange={(val) => {
                             const mins = formData.reception_time ? formData.reception_time.split(':')[1] : '00';
-                            handleChange('reception_time', `${e.target.value}:${mins}`);
+                            handleChange('reception_time', `${val}:${mins}`);
                           }}
-                          className="flex-1 px-4 py-3 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-rose-400 text-center font-semibold"
-                        >
-                          <option value="">Jam</option>
-                          {[...Array(24)].map((_, i) => (
-                            <option key={i} value={i.toString().padStart(2, '0')}>{i.toString().padStart(2, '0')}</option>
-                          ))}
-                        </select>
+                          options={[...Array(24)].map((_, i) => ({ value: i.toString().padStart(2, '0'), label: i.toString().padStart(2, '0') }))}
+                          placeholder="Jam"
+                          gridCols={4}
+                          className="flex-1"
+                        />
                         <span className="text-2xl font-bold text-gray-400">:</span>
-                        <select
+                        <CustomSelect
+                          label="Pilih Menit"
                           value={formData.reception_time ? formData.reception_time.split(':')[1] : ''}
-                          onChange={(e) => {
+                          onChange={(val) => {
                             const hrs = formData.reception_time ? formData.reception_time.split(':')[0] : '00';
-                            handleChange('reception_time', `${hrs}:${e.target.value}`);
+                            handleChange('reception_time', `${hrs}:${val}`);
                           }}
-                          className="flex-1 px-4 py-3 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-rose-400 text-center font-semibold"
-                        >
-                          <option value="">Menit</option>
-                          {['00', '15', '30', '45'].map((m) => (
-                            <option key={m} value={m}>{m}</option>
-                          ))}
-                        </select>
+                          options={['00', '15', '30', '45'].map((m) => ({ value: m, label: m }))}
+                          placeholder="Menit"
+                          gridCols={2}
+                          className="flex-1"
+                        />
                         <span className="text-sm text-gray-500 font-medium">WIB</span>
                       </div>
                     </div>
@@ -1016,19 +1030,18 @@ export default function InvitationEditor() {
                           <div className="grid md:grid-cols-3 gap-4">
                             <div>
                               <label className="block text-xs font-medium text-gray-500 mb-1.5">Bank</label>
-                              <select
+                              <CustomSelect
+                                label="Pilih Bank"
                                 value={account.bank}
-                                onChange={(e) => {
+                                onChange={(val) => {
                                   const newAccounts = [...formData.gift_bank_accounts];
-                                  newAccounts[index].bank = e.target.value;
+                                  newAccounts[index].bank = val;
                                   handleChange('gift_bank_accounts', newAccounts);
                                 }}
-                                className="w-full px-3 py-2.5 bg-white border-0 rounded-xl focus:ring-2 focus:ring-amber-400"
-                              >
-                                {BANK_OPTIONS.map(bank => (
-                                  <option key={bank.id} value={bank.id}>{bank.name}</option>
-                                ))}
-                              </select>
+                                options={BANK_OPTIONS.map(bank => ({ value: bank.id, label: bank.name }))}
+                                placeholder="Pilih Bank"
+                                gridCols={2}
+                              />
                             </div>
                             <div>
                               <label className="block text-xs font-medium text-gray-500 mb-1.5">Nomor Rekening</label>
@@ -1107,19 +1120,18 @@ export default function InvitationEditor() {
                           <div className="grid md:grid-cols-3 gap-4">
                             <div>
                               <label className="block text-xs font-medium text-gray-500 mb-1.5">Jenis</label>
-                              <select
+                              <CustomSelect
+                                label="Pilih E-Wallet"
                                 value={wallet.type}
-                                onChange={(e) => {
+                                onChange={(val) => {
                                   const newWallets = [...formData.gift_ewallets];
-                                  newWallets[index].type = e.target.value;
+                                  newWallets[index].type = val;
                                   handleChange('gift_ewallets', newWallets);
                                 }}
-                                className="w-full px-3 py-2.5 bg-white border-0 rounded-xl focus:ring-2 focus:ring-amber-400"
-                              >
-                                {EWALLET_OPTIONS.map(ew => (
-                                  <option key={ew.id} value={ew.id}>{ew.name}</option>
-                                ))}
-                              </select>
+                                options={EWALLET_OPTIONS.map(ew => ({ value: ew.id, label: ew.name }))}
+                                placeholder="Pilih"
+                                gridCols={2}
+                              />
                             </div>
                             <div>
                               <label className="block text-xs font-medium text-gray-500 mb-1.5">Nomor</label>
@@ -1298,21 +1310,23 @@ export default function InvitationEditor() {
 
           {/* Footer Navigation */}
           {step < 7 && (
-            <div className="px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-between">
+            <div className="px-4 sm:px-8 py-4 sm:py-6 bg-gray-50 border-t border-gray-100 flex justify-between gap-3">
               <button
                 onClick={() => setStep(step - 1)}
                 disabled={step === 1}
-                className="flex items-center gap-2 px-5 py-3 text-gray-600 hover:text-gray-800 disabled:opacity-30 transition-colors"
+                className="flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-5 py-2.5 sm:py-3 text-gray-600 hover:text-gray-800 disabled:opacity-30 transition-colors text-sm sm:text-base"
               >
-                <ArrowLeft className="w-5 h-5" />
-                Sebelumnya
+                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden xs:inline">Sebelumnya</span>
+                <span className="xs:hidden">Back</span>
               </button>
               <button
                 onClick={() => setStep(step + 1)}
-                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-400 to-orange-400 text-white rounded-xl font-medium hover:shadow-lg transition-all"
+                className="flex items-center justify-center gap-1 sm:gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-amber-400 to-orange-400 text-white rounded-lg sm:rounded-xl font-medium hover:shadow-lg transition-all text-sm sm:text-base min-w-[100px]"
               >
-                Selanjutnya
-                <ArrowRight className="w-5 h-5" />
+                <span className="hidden xs:inline">Selanjutnya</span>
+                <span className="xs:hidden">Next</span>
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </div>
           )}

@@ -48,59 +48,94 @@ export default function Footer({ invitation }) {
       return;
     }
 
-    // Create a new canvas with additional info
+    // Create a new canvas with Kekkon branding
     const newCanvas = document.createElement('canvas');
     const ctx = newCanvas.getContext('2d');
-    const padding = 40;
-    const textHeight = guestName.trim() ? 100 : 60;
     
-    newCanvas.width = canvas.width + padding * 2;
-    newCanvas.height = canvas.height + padding * 2 + textHeight;
+    // Dimensions
+    const padding = 48;
+    const qrSize = canvas.width;
+    const qrPadding = 16;
+    const headerHeight = 60;
+    const contentHeight = guestName.trim() ? 115 : 95;
+    const footerHeight = 50;
     
-    // White background
+    newCanvas.width = qrSize + padding * 2 + qrPadding * 2;
+    newCanvas.height = headerHeight + qrSize + qrPadding * 2 + contentHeight + footerHeight + padding;
+    
+    // Background
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
     
-    // Draw QR code
-    ctx.drawImage(canvas, padding, padding);
+    // Header with gradient line
+    const gradient = ctx.createLinearGradient(padding, 0, newCanvas.width - padding, 0);
+    gradient.addColorStop(0, '#f59e0b');
+    gradient.addColorStop(1, '#d97706');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(padding, padding, newCanvas.width - padding * 2, 4);
     
-    // Add text below QR
-    ctx.fillStyle = '#333333';
+    // Kekkon branding
+    ctx.fillStyle = '#d97706';
+    ctx.font = 'bold 20px Arial';
     ctx.textAlign = 'center';
+    ctx.fillText('Kekkon', newCanvas.width / 2, padding + 35);
     
-    // Couple names
+    ctx.fillStyle = '#9ca3af';
+    ctx.font = '11px Arial';
+    ctx.fillText('Undangan Pernikahan Digital', newCanvas.width / 2, padding + 52);
+    
+    // QR Code with border
+    const qrY = headerHeight + padding;
+    ctx.strokeStyle = '#e5e7eb';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(padding, qrY, qrSize + qrPadding * 2, qrSize + qrPadding * 2);
+    ctx.drawImage(canvas, padding + qrPadding, qrY + qrPadding);
+    
+    // Couple names (vertical)
+    const textStartY = qrY + qrSize + qrPadding * 2 + 28;
+    ctx.fillStyle = '#1f2937';
     ctx.font = 'bold 16px Arial';
-    ctx.fillText(
-      `${invitation.bride_name} & ${invitation.groom_name}`,
-      newCanvas.width / 2,
-      canvas.height + padding + 30
-    );
+    ctx.fillText(invitation.bride_name, newCanvas.width / 2, textStartY);
+    
+    ctx.fillStyle = '#d97706';
+    ctx.font = '14px Arial';
+    ctx.fillText('&', newCanvas.width / 2, textStartY + 22);
+    
+    ctx.fillStyle = '#1f2937';
+    ctx.font = 'bold 16px Arial';
+    ctx.fillText(invitation.groom_name, newCanvas.width / 2, textStartY + 44);
     
     // Guest name if provided
     if (guestName.trim()) {
-      ctx.font = '14px Arial';
-      ctx.fillStyle = '#666666';
+      ctx.font = '13px Arial';
+      ctx.fillStyle = '#6b7280';
       ctx.fillText(
-        `Kepada: ${guestName.trim()}`,
+        `Kepada Yth: ${guestName.trim()}`,
         newCanvas.width / 2,
-        canvas.height + padding + 55
+        textStartY + 70
       );
     }
     
-    // Website info
-    ctx.font = '12px Arial';
-    ctx.fillStyle = '#999999';
+    // Scan instruction
+    ctx.font = '11px Arial';
+    ctx.fillStyle = '#9ca3af';
     ctx.fillText(
-      'Scan untuk membuka undangan',
+      'Scan QR code untuk membuka undangan',
       newCanvas.width / 2,
-      canvas.height + padding + (guestName.trim() ? 80 : 55)
+      textStartY + (guestName.trim() ? 92 : 70)
     );
+    
+    // Footer text
+    const footerY = newCanvas.height - 30;
+    ctx.fillStyle = '#d1d5db';
+    ctx.font = '10px Arial';
+    ctx.fillText('kekkon.id', newCanvas.width / 2, footerY);
     
     // Download
     const link = document.createElement('a');
     const fileName = guestName.trim() 
-      ? `qr-undangan-${guestName.trim().replace(/\s+/g, '-').toLowerCase()}.png`
-      : `qr-undangan-${invitation.bride_name}-${invitation.groom_name}.png`;
+      ? `kekkon-${guestName.trim().replace(/\s+/g, '-').toLowerCase()}.png`
+      : `kekkon-${invitation.bride_name}-${invitation.groom_name}.png`.toLowerCase().replace(/\s+/g, '-');
     link.download = fileName;
     link.href = newCanvas.toDataURL('image/png');
     link.click();

@@ -105,47 +105,91 @@ export default function Dashboard() {
 
     const newCanvas = document.createElement('canvas');
     const ctx = newCanvas.getContext('2d');
-    const padding = 40;
-    const textHeight = guestName.trim() ? 100 : 60;
     
-    newCanvas.width = canvas.width + padding * 2;
-    newCanvas.height = canvas.height + padding * 2 + textHeight;
+    // Dimensions
+    const padding = 48;
+    const qrSize = canvas.width;
+    const qrPadding = 16;
+    const headerHeight = 60;
+    const contentHeight = guestName.trim() ? 115 : 95;
+    const footerHeight = 50;
     
+    newCanvas.width = qrSize + padding * 2 + qrPadding * 2;
+    newCanvas.height = headerHeight + qrSize + qrPadding * 2 + contentHeight + footerHeight + padding;
+    
+    // Background
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
-    ctx.drawImage(canvas, padding, padding);
     
-    ctx.fillStyle = '#333333';
+    // Header with gradient line
+    const gradient = ctx.createLinearGradient(padding, 0, newCanvas.width - padding, 0);
+    gradient.addColorStop(0, '#f59e0b');
+    gradient.addColorStop(1, '#d97706');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(padding, padding, newCanvas.width - padding * 2, 4);
+    
+    // Kekkon branding
+    ctx.fillStyle = '#d97706';
+    ctx.font = 'bold 20px Arial';
     ctx.textAlign = 'center';
-    ctx.font = 'bold 16px Arial';
-    ctx.fillText(
-      `${shareModal.bride_name} & ${shareModal.groom_name}`,
-      newCanvas.width / 2,
-      canvas.height + padding + 30
-    );
+    ctx.fillText('Kekkon', newCanvas.width / 2, padding + 35);
     
+    ctx.fillStyle = '#9ca3af';
+    ctx.font = '11px Arial';
+    ctx.fillText('Undangan Pernikahan Digital', newCanvas.width / 2, padding + 52);
+    
+    // QR Code with border
+    const qrY = headerHeight + padding;
+    ctx.strokeStyle = '#e5e7eb';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(padding, qrY, qrSize + qrPadding * 2, qrSize + qrPadding * 2);
+    ctx.drawImage(canvas, padding + qrPadding, qrY + qrPadding);
+    
+    // Couple names (vertical)
+    const textStartY = qrY + qrSize + qrPadding * 2 + 28;
+    ctx.fillStyle = '#1f2937';
+    ctx.font = 'bold 16px Arial';
+    ctx.fillText(shareModal.bride_name, newCanvas.width / 2, textStartY);
+    
+    ctx.fillStyle = '#d97706';
+    ctx.font = '14px Arial';
+    ctx.fillText('&', newCanvas.width / 2, textStartY + 22);
+    
+    ctx.fillStyle = '#1f2937';
+    ctx.font = 'bold 16px Arial';
+    ctx.fillText(shareModal.groom_name, newCanvas.width / 2, textStartY + 44);
+    
+    // Guest name if provided
     if (guestName.trim()) {
-      ctx.font = '14px Arial';
-      ctx.fillStyle = '#666666';
+      ctx.font = '13px Arial';
+      ctx.fillStyle = '#6b7280';
       ctx.fillText(
-        `Kepada: ${guestName.trim()}`,
+        `Kepada Yth: ${guestName.trim()}`,
         newCanvas.width / 2,
-        canvas.height + padding + 55
+        textStartY + 70
       );
     }
     
-    ctx.font = '12px Arial';
-    ctx.fillStyle = '#999999';
+    // Scan instruction
+    ctx.font = '11px Arial';
+    ctx.fillStyle = '#9ca3af';
     ctx.fillText(
-      'Scan untuk membuka undangan',
+      'Scan QR code untuk membuka undangan',
       newCanvas.width / 2,
-      canvas.height + padding + (guestName.trim() ? 80 : 55)
+      textStartY + (guestName.trim() ? 92 : 70)
     );
     
+    // Footer text
+    const footerY = newCanvas.height - 30;
+    ctx.fillStyle = '#d1d5db';
+    ctx.font = '10px Arial';
+    ctx.fillText('kekkon.id', newCanvas.width / 2, footerY);
+    
+    // Download
     const link = document.createElement('a');
     const fileName = guestName.trim() 
-      ? `qr-undangan-${guestName.trim().replace(/\s+/g, '-').toLowerCase()}.png`
-      : `qr-undangan-${shareModal.bride_name}-${shareModal.groom_name}.png`;
+      ? `kekkon-${guestName.trim().replace(/\s+/g, '-').toLowerCase()}.png`
+      : `kekkon-${shareModal.bride_name}-${shareModal.groom_name}.png`.toLowerCase().replace(/\s+/g, '-');
     link.download = fileName;
     link.href = newCanvas.toDataURL('image/png');
     link.click();
@@ -184,26 +228,29 @@ export default function Dashboard() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+        <div className="grid grid-cols-3 gap-3 sm:gap-5 mb-6 sm:mb-8">
           {[
-            { label: 'Total Undangan', value: invitations.length, icon: Heart, gradient: 'from-rose-500 to-pink-500', bg: 'bg-rose-50' },
-            { label: 'Total Views', value: totalViews, icon: Eye, gradient: 'from-blue-500 to-cyan-500', bg: 'bg-blue-50' },
-            { label: 'Tamu Hadir', value: totalGuests, icon: Users, gradient: 'from-violet-500 to-purple-500', bg: 'bg-violet-50' },
+            { label: 'Undangan', labelFull: 'Total Undangan', value: invitations.length, icon: Heart, gradient: 'from-rose-500 to-pink-500' },
+            { label: 'Views', labelFull: 'Total Views', value: totalViews, icon: Eye, gradient: 'from-blue-500 to-cyan-500' },
+            { label: 'Hadir', labelFull: 'Tamu Hadir', value: totalGuests, icon: Users, gradient: 'from-violet-500 to-purple-500' },
           ].map((stat, index) => (
             <motion.div
               key={stat.label}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+              className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-6 shadow-sm border border-gray-100"
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-500 mb-1">{stat.label}</p>
-                  <p className="text-3xl font-bold text-gray-800">{stat.value}</p>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+                <div className="order-2 sm:order-1">
+                  <p className="text-[10px] sm:text-sm text-gray-500 mb-0.5 sm:mb-1">
+                    <span className="sm:hidden">{stat.label}</span>
+                    <span className="hidden sm:inline">{stat.labelFull}</span>
+                  </p>
+                  <p className="text-xl sm:text-3xl font-bold text-gray-800">{stat.value}</p>
                 </div>
-                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center`}>
-                  <stat.icon className="w-7 h-7 text-white" />
+                <div className={`order-1 sm:order-2 w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center`}>
+                  <stat.icon className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
                 </div>
               </div>
             </motion.div>
@@ -211,17 +258,18 @@ export default function Dashboard() {
         </div>
 
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div className="flex items-center justify-between gap-4 mb-4 sm:mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">Undangan Saya</h2>
-            <p className="text-gray-500">Kelola semua undangan pernikahan Anda</p>
+            <h2 className="text-lg sm:text-2xl font-bold text-gray-800">Undangan Saya</h2>
+            <p className="text-xs sm:text-base text-gray-500 hidden sm:block">Kelola semua undangan pernikahan Anda</p>
           </div>
           <Link 
             to="/create" 
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-200 transition-all"
+            className="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg sm:rounded-xl text-sm sm:text-base font-semibold hover:shadow-lg hover:shadow-amber-200 transition-all"
           >
-            <Plus className="w-5 h-5" />
-            Buat Undangan
+            <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="hidden sm:inline">Buat Undangan</span>
+            <span className="sm:hidden">Buat</span>
           </Link>
         </div>
 
@@ -255,17 +303,87 @@ export default function Dashboard() {
             </Link>
           </motion.div>
         ) : (
-          <div className="grid gap-4">
+          <div className="grid gap-3 sm:gap-4">
             {invitations.map((inv, index) => (
               <motion.div
                 key={inv.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md transition-shadow"
+                className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 p-3 sm:p-5 hover:shadow-md transition-shadow"
               >
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                  {/* Info */}
+                {/* Mobile Layout */}
+                <div className="sm:hidden">
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0">
+                      <Heart className="w-5 h-5 text-white" fill="white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="font-bold text-sm text-gray-800 leading-tight">
+                          {inv.bride_name} & {inv.groom_name}
+                        </h3>
+                        <span className={`px-2 py-0.5 text-[10px] font-medium rounded-full flex-shrink-0 ${
+                          inv.status === 'published' 
+                            ? 'bg-emerald-100 text-emerald-700' 
+                            : 'bg-amber-100 text-amber-700'
+                        }`}>
+                          {inv.status === 'published' ? 'Live' : 'Draft'}
+                        </span>
+                      </div>
+                      {inv.wedding_date && (
+                        <p className="text-[11px] text-gray-500 mt-1 flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {format(new Date(inv.wedding_date), 'd MMM yyyy', { locale: id })}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 text-[11px] text-gray-500">
+                      <span className="flex items-center gap-1">
+                        <Eye className="w-3 h-3" /> {inv.view_count || 0}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Users className="w-3 h-3" /> {inv.attending_count || 0}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-1">
+                      {inv.status === 'published' && (
+                        <>
+                          <button
+                            onClick={() => handleOpenShareModal(inv)}
+                            className="p-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg"
+                          >
+                            <Share2 className="w-4 h-4" />
+                          </button>
+                          <a
+                            href={`/${inv.slug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2 bg-gray-100 text-gray-600 rounded-lg"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                          </a>
+                        </>
+                      )}
+                      <Link to={`/edit/${inv.id}`} className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
+                        <Edit className="w-4 h-4" />
+                      </Link>
+                      <Link to={`/guests/${inv.id}`} className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
+                        <Users className="w-4 h-4" />
+                      </Link>
+                      <button onClick={() => setDeleteConfirm(inv)} className="p-2 text-gray-500 hover:bg-rose-50 hover:text-rose-600 rounded-lg">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Desktop Layout */}
+                <div className="hidden sm:flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                   <div className="flex items-start gap-4">
                     <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0">
                       <Heart className="w-7 h-7 text-white" fill="white" />
@@ -300,7 +418,6 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  {/* Actions */}
                   <div className="flex items-center gap-2 lg:gap-3">
                     {inv.status === 'published' && (
                       <>
