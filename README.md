@@ -1,8 +1,6 @@
-# 💒 Wedding Invitation App
+# 💍 Kekkon - Undangan Pernikahan Digital
 
-Aplikasi undangan pernikahan digital modern dengan fitur lengkap: template cantik, RSVP, gift/hadiah, QR code, dan lainnya.
-
-![Wedding App](https://via.placeholder.com/800x400?text=Wedding+Invitation+App)
+**Kekkon** (結婚) adalah platform undangan pernikahan digital **100% gratis** untuk membantu calon mempelai di Indonesia membuat undangan yang cantik dan modern.
 
 ## ✨ Fitur
 
@@ -57,8 +55,8 @@ Aplikasi undangan pernikahan digital modern dengan fitur lengkap: template canti
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/USERNAME/wedding-invitation-app.git
-cd wedding-invitation-app
+git clone https://github.com/USERNAME/kekkon.git
+cd kekkon
 ```
 
 ### 2. Install Dependencies
@@ -114,7 +112,7 @@ Buka browser: `http://localhost:5173`
 ### 1. Buat Repository Baru di GitHub
 
 1. Buka https://github.com/new
-2. Isi nama repository: `wedding-invitation-app`
+2. Isi nama repository: `kekkon`
 3. Pilih **Private** atau **Public**
 4. Jangan centang "Initialize with README"
 5. Klik **Create repository**
@@ -123,7 +121,7 @@ Buka browser: `http://localhost:5173`
 
 ```bash
 # Masuk ke folder project
-cd wedding-invitation-app
+cd kekkon
 
 # Initialize git (jika belum)
 git init
@@ -172,10 +170,10 @@ EOF
 git add .
 
 # Commit pertama
-git commit -m "Initial commit: Wedding Invitation App"
+git commit -m "Initial commit: Kekkon"
 
 # Tambah remote origin
-git remote add origin https://github.com/USERNAME/wedding-invitation-app.git
+git remote add origin https://github.com/USERNAME/kekkon.git
 
 # Push ke GitHub
 git branch -M main
@@ -228,7 +226,7 @@ Setelah disetujui:
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Wedding Invitation</title>
+    <title>Kekkon - Undangan Pernikahan Digital</title>
     
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
@@ -455,8 +453,8 @@ mkdir -p /var/www
 cd /var/www
 
 # Clone repository
-git clone https://github.com/USERNAME/wedding-invitation-app.git
-cd wedding-invitation-app
+git clone https://github.com/USERNAME/kekkon.git
+cd kekkon
 
 # Install dependencies
 cd server
@@ -471,7 +469,7 @@ npm run build
 
 ```bash
 # Buat file .env untuk production
-cd /var/www/wedding-invitation-app/server
+cd /var/www/kekkon/server
 nano .env
 ```
 
@@ -491,10 +489,10 @@ openssl rand -hex 32
 ### 5. Setup PM2
 
 ```bash
-cd /var/www/wedding-invitation-app/server
+cd /var/www/kekkon/server
 
 # Start dengan PM2
-pm2 start server.js --name wedding-api
+pm2 start server.js --name kekkon-api
 
 # Save PM2 config
 pm2 save
@@ -506,7 +504,7 @@ pm2 startup
 ### 6. Konfigurasi Nginx
 
 ```bash
-nano /etc/nginx/sites-available/wedding-app
+nano /etc/nginx/sites-available/kekkon
 ```
 
 Isi konfigurasi:
@@ -535,7 +533,7 @@ server {
     gzip_types text/plain text/css application/json application/javascript text/xml application/xml;
 
     # Frontend (React build)
-    root /var/www/wedding-invitation-app/client/dist;
+    root /var/www/kekkon/client/dist;
     index index.html;
 
     # Handle React Router
@@ -563,7 +561,7 @@ server {
 
     # Uploads folder
     location /uploads {
-        alias /var/www/wedding-invitation-app/server/uploads;
+        alias /var/www/kekkon/server/uploads;
         expires 30d;
         add_header Cache-Control "public, immutable";
     }
@@ -578,7 +576,7 @@ server {
 
 Enable site:
 ```bash
-ln -s /etc/nginx/sites-available/wedding-app /etc/nginx/sites-enabled/
+ln -s /etc/nginx/sites-available/kekkon /etc/nginx/sites-enabled/
 nginx -t
 systemctl reload nginx
 ```
@@ -598,9 +596,9 @@ certbot --nginx -d undangan.domain.com -d www.undangan.domain.com
 ### 8. Setup Uploads Directory
 
 ```bash
-mkdir -p /var/www/wedding-invitation-app/server/uploads
-chown -R www-data:www-data /var/www/wedding-invitation-app/server/uploads
-chmod 755 /var/www/wedding-invitation-app/server/uploads
+mkdir -p /var/www/kekkon/server/uploads
+chown -R www-data:www-data /var/www/kekkon/server/uploads
+chmod 755 /var/www/kekkon/server/uploads
 ```
 
 ### 9. Setup Backup (Opsional tapi Recommended)
@@ -617,10 +615,10 @@ DATE=$(date +%Y%m%d_%H%M%S)
 mkdir -p $BACKUP_DIR
 
 # Backup database
-cp /var/www/wedding-invitation-app/database/wedding.db $BACKUP_DIR/wedding_$DATE.db
+cp /var/www/kekkon/database/wedding.db $BACKUP_DIR/kekkon_$DATE.db
 
 # Backup uploads
-tar -czf $BACKUP_DIR/uploads_$DATE.tar.gz /var/www/wedding-invitation-app/server/uploads
+tar -czf $BACKUP_DIR/uploads_$DATE.tar.gz /var/www/kekkon/server/uploads
 
 # Keep only last 7 backups
 find $BACKUP_DIR -type f -mtime +7 -delete
@@ -629,24 +627,24 @@ echo "Backup completed: $DATE"
 ```
 
 ```bash
-chmod +x /root/backup-wedding.sh
+chmod +x /root/backup-kekkon.sh
 
 # Setup cron job (daily backup at 2 AM)
 crontab -e
 # Tambahkan:
-0 2 * * * /root/backup-wedding.sh
+0 2 * * * /root/backup-kekkon.sh
 ```
 
 ### 10. Update Deployment
 
 Script untuk update:
 ```bash
-nano /root/update-wedding.sh
+nano /root/update-kekkon.sh
 ```
 
 ```bash
 #!/bin/bash
-cd /var/www/wedding-invitation-app
+cd /var/www/kekkon
 
 # Pull latest changes
 git pull origin main
@@ -661,13 +659,13 @@ npm install
 npm run build
 
 # Restart PM2
-pm2 restart wedding-api
+pm2 restart kekkon-api
 
 echo "Update completed!"
 ```
 
 ```bash
-chmod +x /root/update-wedding.sh
+chmod +x /root/update-kekkon.sh
 ```
 
 ---
@@ -710,7 +708,7 @@ Environment variables untuk client diset saat build di `vite.config.js` atau via
 **Solusi:**
 ```bash
 # Restart PM2
-pm2 restart wedding-api
+pm2 restart kekkon-api
 ```
 
 ### Error: 502 Bad Gateway
@@ -723,10 +721,10 @@ pm2 restart wedding-api
 pm2 status
 
 # Cek logs
-pm2 logs wedding-api
+pm2 logs kekkon-api
 
 # Restart jika perlu
-pm2 restart wedding-api
+pm2 restart kekkon-api
 ```
 
 ### Error: Permission Denied Uploads
@@ -735,8 +733,8 @@ pm2 restart wedding-api
 
 **Solusi:**
 ```bash
-chown -R www-data:www-data /var/www/wedding-invitation-app/server/uploads
-chmod 755 /var/www/wedding-invitation-app/server/uploads
+chown -R www-data:www-data /var/www/kekkon/server/uploads
+chmod 755 /var/www/kekkon/server/uploads
 ```
 
 ### Error: SSL Certificate
@@ -756,7 +754,7 @@ systemctl restart nginx
 
 ```bash
 # PM2 logs
-pm2 logs wedding-api
+pm2 logs kekkon-api
 
 # Nginx logs
 tail -f /var/log/nginx/error.log
@@ -785,8 +783,7 @@ MIT License - feel free to use for personal or commercial projects.
 
 Jika ada pertanyaan atau butuh bantuan:
 - Buat Issue di GitHub
-- Email: your-email@example.com
 
 ---
 
-Made with ❤️ for Indonesian Weddings
+Made with ❤️ by **Kekkon** for Indonesian Weddings
