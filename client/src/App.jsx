@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LandingPage from './components/LandingPage';
@@ -11,6 +12,16 @@ import InvitationPage from './components/public/InvitationPage';
 import ProtectedRoute from './components/shared/ProtectedRoute';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import AboutUs from './components/AboutUs';
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  
+  return null;
+}
 
 function AuthRoute({ children }) {
   const { user, loading } = useAuth();
@@ -53,6 +64,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <ScrollToTop />
         <AppRoutes />
         <Toaster 
           position="top-center"
