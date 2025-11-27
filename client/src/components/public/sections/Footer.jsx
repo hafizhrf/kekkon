@@ -211,10 +211,10 @@ export default function Footer({ invitation }) {
           {/* Copyright */}
           <div className="text-center">
             <p className="text-sm text-gray-400 flex items-center justify-center gap-1">
-              Made with <Heart className="w-3 h-3 text-red-400 mx-1" fill="currentColor" /> by Wedding App
+              Made with <Heart className="w-3 h-3 text-red-400 mx-1" fill="currentColor" /> by <span className="font-semibold text-amber-600">Kekkon</span>
             </p>
             <p className="text-xs text-gray-300 mt-2">
-              &copy; {new Date().getFullYear()} All rights reserved
+              &copy; {new Date().getFullYear()} Kekkon. All rights reserved
             </p>
           </div>
         </motion.div>

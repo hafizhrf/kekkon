@@ -53,13 +53,11 @@ export default function Register() {
         className="max-w-md w-full bg-white rounded-3xl shadow-xl shadow-amber-100/50 p-8 relative z-10"
       >
         <div className="text-center mb-8">
-          <Link to="/" className="inline-block">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl mb-4">
-              <Heart className="w-8 h-8 text-white" fill="white" />
-            </div>
+          <Link to="/" className="inline-block mb-4">
+            <KekkonIcon size={64} id="register" />
           </Link>
-          <h1 className="text-3xl font-playfair font-bold text-gray-800">Buat Akun</h1>
-          <p className="text-gray-500 mt-2">Mulai buat undangan pernikahan Anda</p>
+          <h1 className="text-3xl font-bold text-gray-800">Daftar <span className="text-amber-600">Kekkon</span></h1>
+          <p className="text-gray-500 mt-2">Mulai buat undangan pernikahan digital gratis</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
