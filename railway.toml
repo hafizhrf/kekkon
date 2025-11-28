@@ -19,7 +19,5 @@ cmds = ["cd /app/client && npm run build"]
 
 [deploy]
 startCommand = "cd /app/server && node server.js"
-healthcheckPath = "/api/health"
-healthcheckTimeout = 100
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
