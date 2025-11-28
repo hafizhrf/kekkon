@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import toast from 'react-hot-toast';
 import { useAuth } from '../../contexts/AuthContext';
-import { Mail, Lock, User, ArrowRight } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, AlertCircle } from 'lucide-react';
 import { KekkonIcon } from '../shared/Logo';
 
 export default function Register() {
@@ -12,19 +11,21 @@ export default function Register() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
 
     if (password !== confirmPassword) {
-      toast.error('Password tidak cocok');
+      setError('Password tidak cocok');
       return;
     }
 
     if (password.length < 6) {
-      toast.error('Password minimal 6 karakter');
+      setError('Password minimal 6 karakter');
       return;
     }
 
@@ -32,10 +33,9 @@ export default function Register() {
 
     try {
       await register(email, password, name);
-      toast.success('Akun berhasil dibuat!');
       navigate('/dashboard');
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Registrasi gagal');
+      setError(err.response?.data?.error || 'Registrasi gagal');
     } finally {
       setLoading(false);
     }
@@ -119,6 +119,13 @@ export default function Register() {
               />
             </div>
           </div>
+
+          {error && (
+            <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
+              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
 
           <button
             type="submit"

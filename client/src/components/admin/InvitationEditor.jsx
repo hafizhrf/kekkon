@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { invitationAPI, templateAPI, uploadAPI } from '../../utils/api';
-import { ArrowLeft, ArrowRight, Upload, X, Check, Eye, Heart, Sparkles, Image, Music, Settings, Send, Palette, Type, Calendar, MapPin, Clock, User, Users, Gift, CreditCard, Wallet, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Upload, X, Check, Eye, Heart, Sparkles, Image, Music, Settings, Send, Palette, Type, Calendar, MapPin, Clock, User, Users, Gift, CreditCard, Wallet, Plus, Trash2, Moon, Church, AlertTriangle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
 import { motion } from 'framer-motion';
 import RichTextEditor from '../shared/RichTextEditor';
@@ -207,9 +208,9 @@ export default function InvitationEditor() {
     setUploadingGallery(true);
     try {
       const uploads = await Promise.all(files.map(file => uploadAPI.image(file)));
-      const urls = uploads.map(res => res.data.url);
-      handleChange('gallery_images', [...formData.gallery_images, ...urls]);
-      toast.success(`${urls.length} foto ditambahkan`);
+      const newItems = uploads.map(res => ({ url: res.data.url, caption: '' }));
+      handleChange('gallery_images', [...formData.gallery_images, ...newItems]);
+      toast.success(`${newItems.length} foto ditambahkan`);
     } catch (err) {
       toast.error('Gagal upload gambar');
     } finally {
@@ -221,6 +222,21 @@ export default function InvitationEditor() {
     const newImages = formData.gallery_images.filter((_, i) => i !== index);
     handleChange('gallery_images', newImages);
   };
+
+  const updateGalleryCaption = (index, caption) => {
+    const newImages = [...formData.gallery_images];
+    // Handle backward compatibility - convert string to object if needed
+    if (typeof newImages[index] === 'string') {
+      newImages[index] = { url: newImages[index], caption };
+    } else {
+      newImages[index] = { ...newImages[index], caption };
+    }
+    handleChange('gallery_images', newImages);
+  };
+
+  // Helper to get image URL (backward compatible)
+  const getGalleryImageUrl = (item) => typeof item === 'string' ? item : item.url;
+  const getGalleryImageCaption = (item) => typeof item === 'string' ? '' : (item.caption || '');
 
   const handleSave = async () => {
     setSaving(true);
@@ -363,6 +379,19 @@ export default function InvitationEditor() {
             >
               {saving ? 'Menyimpan...' : 'Simpan'}
             </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Expiration Alert */}
+      <div className="max-w-6xl mx-auto px-4 pt-4">
+        <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+          <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm text-amber-800">
+              <strong>Penting:</strong> Undangan akan aktif selama 3 bulan sejak dibuat. Setelah itu, undangan dan semua data (foto, musik, tamu) akan dihapus secara otomatis.{' '}
+              <Link to="/terms" className="text-amber-600 underline hover:text-amber-700">Baca Syarat & Ketentuan</Link>
+            </p>
           </div>
         </div>
       </div>
@@ -545,7 +574,9 @@ export default function InvitationEditor() {
                           : 'border-gray-200 bg-gray-50 hover:border-gray-300'
                       }`}
                     >
-                      <div className="text-2xl sm:text-3xl mb-2">🕌</div>
+                      <div className={`w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 rounded-full flex items-center justify-center ${formData.is_muslim ? 'bg-emerald-100' : 'bg-gray-100'}`}>
+                        <Moon className={`w-5 h-5 sm:w-6 sm:h-6 ${formData.is_muslim ? 'text-emerald-600' : 'text-gray-400'}`} />
+                      </div>
                       <span className={`text-sm sm:text-base font-semibold ${formData.is_muslim ? 'text-emerald-700' : 'text-gray-600'}`}>
                         Muslim
                       </span>
@@ -562,7 +593,9 @@ export default function InvitationEditor() {
                           : 'border-gray-200 bg-gray-50 hover:border-gray-300'
                       }`}
                     >
-                      <div className="text-2xl sm:text-3xl mb-2">💒</div>
+                      <div className={`w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 rounded-full flex items-center justify-center ${!formData.is_muslim ? 'bg-amber-100' : 'bg-gray-100'}`}>
+                        <Church className={`w-5 h-5 sm:w-6 sm:h-6 ${!formData.is_muslim ? 'text-amber-600' : 'text-gray-400'}`} />
+                      </div>
                       <span className={`text-sm sm:text-base font-semibold ${!formData.is_muslim ? 'text-amber-700' : 'text-gray-600'}`}>
                         Umum
                       </span>
@@ -705,6 +738,54 @@ export default function InvitationEditor() {
                   <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-5">
                     <div className="grid grid-cols-3 gap-3">
                       <div>
+                        <label className="block text-xs font-medium text-gray-500 mb-1.5">Tahun</label>
+                        <CustomSelect
+                          label="Pilih Tahun"
+                          value={formData.wedding_date ? new Date(formData.wedding_date).getFullYear().toString() : ''}
+                          onChange={(val) => {
+                            const today = new Date();
+                            const current = formData.wedding_date ? new Date(formData.wedding_date) : new Date();
+                            current.setFullYear(parseInt(val));
+                            if (current < today) {
+                              current.setMonth(today.getMonth());
+                              current.setDate(today.getDate());
+                            }
+                            handleChange('wedding_date', current.toISOString().split('T')[0]);
+                          }}
+                          options={[...Array(10)].map((_, i) => {
+                            const year = new Date().getFullYear() + i;
+                            return { value: year.toString(), label: year.toString() };
+                          })}
+                          placeholder="--"
+                          gridCols={2}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-500 mb-1.5">Bulan</label>
+                        <CustomSelect
+                          label="Pilih Bulan"
+                          value={formData.wedding_date ? new Date(formData.wedding_date).getMonth().toString() : ''}
+                          onChange={(val) => {
+                            const today = new Date();
+                            const current = formData.wedding_date ? new Date(formData.wedding_date) : new Date();
+                            current.setMonth(parseInt(val));
+                            if (current < today) {
+                              current.setDate(today.getDate());
+                            }
+                            handleChange('wedding_date', current.toISOString().split('T')[0]);
+                          }}
+                          options={(() => {
+                            const today = new Date();
+                            const selectedYear = formData.wedding_date ? new Date(formData.wedding_date).getFullYear() : today.getFullYear();
+                            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+                            return months.map((m, i) => ({ value: i.toString(), label: m }))
+                              .filter((_, i) => selectedYear > today.getFullYear() || i >= today.getMonth());
+                          })()}
+                          placeholder="--"
+                          gridCols={3}
+                        />
+                      </div>
+                      <div>
                         <label className="block text-xs font-medium text-gray-500 mb-1.5">Tanggal</label>
                         <CustomSelect
                           label="Pilih Tanggal"
@@ -714,42 +795,21 @@ export default function InvitationEditor() {
                             current.setDate(parseInt(val));
                             handleChange('wedding_date', current.toISOString().split('T')[0]);
                           }}
-                          options={[...Array(31)].map((_, i) => ({ value: (i + 1).toString(), label: (i + 1).toString() }))}
+                          options={(() => {
+                            const today = new Date();
+                            const current = formData.wedding_date ? new Date(formData.wedding_date) : today;
+                            const year = current.getFullYear();
+                            const month = current.getMonth();
+                            const daysInMonth = new Date(year, month + 1, 0).getDate();
+                            const isCurrentMonth = year === today.getFullYear() && month === today.getMonth();
+                            const startDay = isCurrentMonth ? today.getDate() : 1;
+                            return [...Array(daysInMonth - startDay + 1)].map((_, i) => {
+                              const day = startDay + i;
+                              return { value: day.toString(), label: day.toString() };
+                            });
+                          })()}
                           placeholder="--"
                           gridCols={5}
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-gray-500 mb-1.5">Bulan</label>
-                        <CustomSelect
-                          label="Pilih Bulan"
-                          value={formData.wedding_date ? new Date(formData.wedding_date).getMonth().toString() : ''}
-                          onChange={(val) => {
-                            const current = formData.wedding_date ? new Date(formData.wedding_date) : new Date();
-                            current.setMonth(parseInt(val));
-                            handleChange('wedding_date', current.toISOString().split('T')[0]);
-                          }}
-                          options={['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'].map((m, i) => ({ value: i.toString(), label: m }))}
-                          placeholder="--"
-                          gridCols={3}
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-gray-500 mb-1.5">Tahun</label>
-                        <CustomSelect
-                          label="Pilih Tahun"
-                          value={formData.wedding_date ? new Date(formData.wedding_date).getFullYear().toString() : ''}
-                          onChange={(val) => {
-                            const current = formData.wedding_date ? new Date(formData.wedding_date) : new Date();
-                            current.setFullYear(parseInt(val));
-                            handleChange('wedding_date', current.toISOString().split('T')[0]);
-                          }}
-                          options={[...Array(10)].map((_, i) => {
-                            const year = new Date().getFullYear() + i;
-                            return { value: year.toString(), label: year.toString() };
-                          })}
-                          placeholder="--"
-                          gridCols={2}
                         />
                       </div>
                     </div>
@@ -1011,23 +1071,38 @@ export default function InvitationEditor() {
                     <Image className="w-4 h-4 text-emerald-500" />
                     Gallery Foto
                   </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {formData.gallery_images.map((img, i) => (
-                      <div key={i} className="relative group rounded-2xl overflow-hidden">
-                        <img src={img} alt="" className="w-full h-28 object-cover" />
-                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                          <button
-                            onClick={() => removeGalleryImage(i)}
-                            className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
+                      <div key={i} className="bg-gray-50 rounded-2xl overflow-hidden">
+                        <div className="relative group">
+                          <img src={getGalleryImageUrl(img)} alt="" className="w-full h-36 object-cover" />
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button
+                              onClick={() => removeGalleryImage(i)}
+                              className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                          <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+                            {i + 1}
+                          </div>
+                        </div>
+                        <div className="p-3">
+                          <input
+                            type="text"
+                            value={getGalleryImageCaption(img)}
+                            onChange={(e) => updateGalleryCaption(i, e.target.value)}
+                            placeholder="Tambahkan caption..."
+                            maxLength={100}
+                            className="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+                          />
                         </div>
                       </div>
                     ))}
                     {formData.gallery_images.length < 10 && (
                       uploadingGallery ? (
-                        <div className="h-28 border-2 border-amber-300 bg-amber-50 rounded-2xl flex flex-col items-center justify-center">
+                        <div className="h-48 border-2 border-amber-300 bg-amber-50 rounded-2xl flex flex-col items-center justify-center">
                           <div className="relative">
                             <div className="w-10 h-10 rounded-full border-3 border-amber-200" />
                             <div className="absolute inset-0 w-10 h-10 rounded-full border-3 border-amber-500 border-t-transparent animate-spin" />
@@ -1035,7 +1110,7 @@ export default function InvitationEditor() {
                           <span className="text-xs text-amber-600 mt-2">Uploading...</span>
                         </div>
                       ) : (
-                        <label className="h-28 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-amber-400 hover:bg-amber-50/50 transition-all">
+                        <label className="h-48 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-amber-400 hover:bg-amber-50/50 transition-all">
                           <input
                             type="file"
                             accept="image/*"
@@ -1043,13 +1118,13 @@ export default function InvitationEditor() {
                             onChange={(e) => handleGalleryUpload(Array.from(e.target.files))}
                             className="hidden"
                           />
-                          <Upload className="w-6 h-6 text-gray-400" />
-                          <span className="text-xs text-gray-400 mt-1">Tambah</span>
+                          <Upload className="w-8 h-8 text-gray-400" />
+                          <span className="text-sm text-gray-400 mt-2">Tambah Foto</span>
                         </label>
                       )
                     )}
                   </div>
-                  <p className="text-xs text-gray-400 mt-3">Max 10 foto, masing-masing max 2MB</p>
+                  <p className="text-xs text-gray-400 mt-3">Max 10 foto, masing-masing max 2MB. Caption opsional (max 100 karakter)</p>
                 </div>
               </div>
             )}

@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, ChevronDown, X } from 'lucide-react';
 
@@ -15,7 +16,10 @@ export default function CustomSelect({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [dropdownStyle, setDropdownStyle] = useState({});
   const containerRef = useRef(null);
+  const triggerRef = useRef(null);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 640);
@@ -24,10 +28,39 @@ export default function CustomSelect({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Update dropdown position
+  const updatePosition = useCallback(() => {
+    if (triggerRef.current && isOpen && !isMobile) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      const minWidth = gridCols > 1 ? Math.max(200, rect.width) : rect.width;
+      setDropdownStyle({
+        position: 'fixed',
+        top: rect.bottom + 4,
+        left: rect.left,
+        minWidth: minWidth,
+        zIndex: 9999,
+      });
+    }
+  }, [isOpen, isMobile, gridCols]);
+
+  useEffect(() => {
+    updatePosition();
+    if (isOpen && !isMobile) {
+      window.addEventListener('scroll', updatePosition, true);
+      window.addEventListener('resize', updatePosition);
+      return () => {
+        window.removeEventListener('scroll', updatePosition, true);
+        window.removeEventListener('resize', updatePosition);
+      };
+    }
+  }, [isOpen, isMobile, updatePosition]);
+
   useEffect(() => {
     if (!isMobile && isOpen) {
       const handleClickOutside = (e) => {
-        if (containerRef.current && !containerRef.current.contains(e.target)) {
+        const isInsideContainer = containerRef.current?.contains(e.target);
+        const isInsideDropdown = dropdownRef.current?.contains(e.target);
+        if (!isInsideContainer && !isInsideDropdown) {
           setIsOpen(false);
         }
       };
@@ -73,49 +106,46 @@ export default function CustomSelect({
     <div ref={containerRef} className={`relative ${className}`}>
       {/* Trigger Button */}
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={`w-full flex items-center justify-between px-4 py-3 bg-gray-50 rounded-xl text-left transition-all
           ${isOpen ? 'ring-2 ring-amber-400' : 'hover:bg-gray-100'}`}
       >
-        <span className={`${selectedOption ? 'text-gray-800' : 'text-gray-400'} font-medium`}>
+        <span className={`${selectedOption ? 'text-gray-800' : 'text-gray-400'} font-medium truncate`}>
           {renderValue ? renderValue(selectedOption) : defaultRenderValue(selectedOption)}
         </span>
-        <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
-      {/* Desktop Popup */}
-      <AnimatePresence>
-        {isOpen && !isMobile && (
-          <motion.div
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            transition={{ duration: 0.15 }}
-            className="absolute z-50 w-full mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
-            style={{ maxHeight: '300px' }}
-          >
-            <div className={`p-2 overflow-y-auto grid ${gridClass} gap-1`} style={{ maxHeight: '280px' }}>
-              {options.map((opt) => {
-                const isSelected = opt.value === value;
-                return (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => handleSelect(opt.value)}
-                    className={`w-full px-3 py-2.5 rounded-xl text-left text-sm transition-all
-                      ${isSelected 
-                        ? 'bg-amber-50 text-amber-700' 
-                        : 'hover:bg-gray-50 text-gray-700'}`}
-                  >
-                    {renderOption ? renderOption(opt, isSelected) : defaultRenderOption(opt, isSelected)}
-                  </button>
-                );
-              })}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Desktop Popup - Using Portal */}
+      {isOpen && !isMobile && createPortal(
+        <div
+          ref={dropdownRef}
+          className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
+          style={dropdownStyle}
+        >
+          <div className={`p-2 overflow-y-auto grid ${gridClass} gap-1`} style={{ maxHeight: '280px' }}>
+            {options.map((opt) => {
+              const isSelected = opt.value === value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => handleSelect(opt.value)}
+                  className={`w-full px-3 py-2.5 rounded-xl text-left text-sm transition-all
+                    ${isSelected 
+                      ? 'bg-amber-50 text-amber-700' 
+                      : 'hover:bg-gray-50 text-gray-700'}`}
+                >
+                  {renderOption ? renderOption(opt, isSelected) : defaultRenderOption(opt, isSelected)}
+                </button>
+              );
+            })}
+          </div>
+        </div>,
+        document.body
+      )}
 
       {/* Mobile Bottom Sheet */}
       <AnimatePresence>

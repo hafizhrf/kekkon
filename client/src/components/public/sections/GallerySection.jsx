@@ -4,7 +4,12 @@ import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function GallerySection({ invitation }) {
   const [selectedIndex, setSelectedIndex] = useState(null);
-  const images = invitation.gallery_images || [];
+  const rawImages = invitation.gallery_images || [];
+  
+  // Normalize images to always have url and caption (backward compatible)
+  const images = rawImages.map(img => 
+    typeof img === 'string' ? { url: img, caption: '' } : { url: img.url, caption: img.caption || '' }
+  );
 
   const openLightbox = (index) => setSelectedIndex(index);
   const closeLightbox = () => setSelectedIndex(null);
@@ -53,13 +58,20 @@ export default function GallerySection({ invitation }) {
               onClick={() => openLightbox(index)}
             >
               <img
-                src={img}
-                alt={`Gallery ${index + 1}`}
+                src={img.url}
+                alt={img.caption || `Gallery ${index + 1}`}
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="absolute bottom-3 left-3 text-white text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                {index + 1} / {images.length}
+              <div className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent transition-opacity ${img.caption ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
+              <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4">
+                {img.caption && (
+                  <p className="text-white text-sm md:text-base font-medium line-clamp-2 mb-1">
+                    {img.caption}
+                  </p>
+                )}
+                <div className="text-white/70 text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                  {index + 1} / {images.length}
+                </div>
               </div>
             </motion.div>
           ))}
@@ -100,18 +112,26 @@ export default function GallerySection({ invitation }) {
               </button>
             )}
 
-            <motion.img
-              key={selectedIndex}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              src={images[selectedIndex]}
-              alt=""
-              className="max-h-[85vh] max-w-[90vw] object-contain"
-              onClick={(e) => e.stopPropagation()}
-            />
-
-            <div className="absolute bottom-4 text-white text-sm">
-              {selectedIndex + 1} / {images.length}
+            <div className="flex flex-col items-center max-h-[90vh] max-w-[90vw]" onClick={(e) => e.stopPropagation()}>
+              <motion.img
+                key={selectedIndex}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                src={images[selectedIndex].url}
+                alt={images[selectedIndex].caption || ''}
+                className="max-h-[75vh] max-w-full object-contain rounded-lg"
+              />
+              
+              <div className="mt-4 text-center px-4">
+                {images[selectedIndex].caption && (
+                  <p className="text-white text-base md:text-lg mb-2 max-w-2xl">
+                    {images[selectedIndex].caption}
+                  </p>
+                )}
+                <div className="text-white/60 text-sm">
+                  {selectedIndex + 1} / {images.length}
+                </div>
+              </div>
             </div>
           </motion.div>
         )}

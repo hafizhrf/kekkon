@@ -1,28 +1,28 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import toast from 'react-hot-toast';
 import { useAuth } from '../../contexts/AuthContext';
-import { Mail, Lock, ArrowRight } from 'lucide-react';
+import { Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react';
 import { KekkonIcon } from '../shared/Logo';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
 
     try {
       await login(email, password);
-      toast.success('Selamat datang kembali!');
       navigate('/dashboard');
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Email atau password salah');
+      setError(err.response?.data?.error || 'Email atau password salah');
     } finally {
       setLoading(false);
     }
@@ -77,6 +77,13 @@ export default function Login() {
               />
             </div>
           </div>
+
+          {error && (
+            <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
+              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
 
           <button
             type="submit"

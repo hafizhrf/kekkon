@@ -60,7 +60,7 @@ const getTemplateStyle = (templateId, primaryColor) => {
   };
 };
 
-export default function ScrollTimeline({ templateId, primaryColor, hasGallery = true, hasGift = true }) {
+export default function ScrollTimeline({ templateId, primaryColor, hasGallery = true, hasGift = true, hasRsvp = true }) {
   const [activeSection, setActiveSection] = useState('home');
   const [scrollProgress, setScrollProgress] = useState(0);
 
@@ -68,6 +68,7 @@ export default function ScrollTimeline({ templateId, primaryColor, hasGallery = 
   const visibleSections = SECTIONS.filter(section => {
     if (section.id === 'gallery' && !hasGallery) return false;
     if (section.id === 'gift' && !hasGift) return false;
+    if (section.id === 'rsvp' && !hasRsvp) return false;
     return true;
   });
 

@@ -35,12 +35,14 @@
 ## 📋 Daftar Isi
 
 1. [Quick Start (Development)](#-quick-start-development)
-2. [Push ke GitHub](#-push-ke-github)
-3. [Setup Google AdSense](#-setup-google-adsense)
-4. [Deployment Lokal ke Domain](#-deployment-lokal-ke-domain)
-5. [Deployment ke VPS](#-deployment-ke-vps-production)
-6. [Environment Variables](#-environment-variables)
-7. [Troubleshooting](#-troubleshooting)
+2. [Superadmin Dashboard](#-superadmin-dashboard)
+3. [Push ke GitHub](#-push-ke-github)
+4. [Setup Google AdSense](#-setup-google-adsense)
+5. [Deployment Lokal ke Domain](#-deployment-lokal-ke-domain)
+6. [Deployment ke VPS](#-deployment-ke-vps-production)
+7. [Maintenance](#-maintenance)
+8. [Environment Variables](#-environment-variables)
+9. [Troubleshooting](#-troubleshooting)
 
 ---
 
@@ -104,6 +106,31 @@ npm run dev
 ```
 
 Buka browser: `http://localhost:5173`
+
+---
+
+## 🛡️ Superadmin Dashboard
+
+Kekkon memiliki dashboard admin untuk mengelola users dan undangan.
+
+### Akses Dashboard
+
+1. Buka `https://yourdomain.com/superadmin`
+2. Login dengan credentials dari `.env`:
+   - Email: `SUPERADMIN_EMAIL`
+   - Password: `SUPERADMIN_PASSWORD`
+
+### Fitur Dashboard
+
+- **Overview**: Statistik total users, undangan, dan RSVP
+- **Manage Users**: Lihat dan hapus akun users
+- **Manage Invitations**: Lihat, hapus undangan, dan cek expiry date
+
+### Catatan Penting
+
+- Jika sedang login sebagai user biasa, logout dulu sebelum login admin
+- Undangan memiliki masa berlaku 3 bulan (dapat dilihat di halaman Terms & Conditions)
+- Akses admin terpisah dari akses user
 
 ---
 
@@ -272,72 +299,104 @@ Untuk menjalankan di komputer lokal tapi bisa diakses via domain (misalnya untuk
 
 ### Metode 1: Menggunakan Cloudflare Tunnel (Recommended)
 
+Cara paling mudah untuk expose localhost ke internet tanpa port forwarding.
+
 #### 1. Setup Cloudflare
 
 1. Daftar di https://www.cloudflare.com/
 2. Tambahkan domain Anda ke Cloudflare
-3. Update nameserver di registrar domain
+3. Update nameserver di registrar domain ke Cloudflare
 
 #### 2. Install Cloudflared
 
 ```bash
+# Ubuntu/Debian
+curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb -o cloudflared.deb
+sudo dpkg -i cloudflared.deb
+
 # Windows (dengan winget)
 winget install Cloudflare.cloudflared
 
-# Atau download dari:
-# https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/installation/
+# macOS
+brew install cloudflared
 ```
 
-#### 3. Login ke Cloudflare
+#### 3. Login & Buat Tunnel
 
 ```bash
+# Login ke Cloudflare (buka browser untuk autentikasi)
 cloudflared tunnel login
-```
 
-#### 4. Buat Tunnel
-
-```bash
 # Buat tunnel baru
-cloudflared tunnel create wedding-app
+cloudflared tunnel create kekkon
 
-# Akan muncul Tunnel ID, simpan untuk nanti
+# Output akan menampilkan Tunnel ID, contoh:
+# Created tunnel kekkon with id 1d585a82-de4d-46c0-98b8-b11b494b0527
 ```
 
-#### 5. Konfigurasi Tunnel
+#### 4. Konfigurasi Tunnel
 
-Buat file `~/.cloudflared/config.yml`:
+Buat file config di `~/.cloudflared/config.yml`:
 ```yaml
-tunnel: YOUR-TUNNEL-ID
-credentials-file: /path/to/.cloudflared/YOUR-TUNNEL-ID.json
+tunnel: 1d585a82-de4d-46c0-98b8-b11b494b0527  # Ganti dengan Tunnel ID Anda
+credentials-file: /home/USERNAME/.cloudflared/1d585a82-de4d-46c0-98b8-b11b494b0527.json
 
 ingress:
-  - hostname: undangan.domain.com
+  - hostname: kekkon.yourdomain.com
     service: http://localhost:5000
   - service: http_status:404
 ```
 
-#### 6. Route DNS
+#### 5. Route DNS
 
 ```bash
-cloudflared tunnel route dns wedding-app undangan.domain.com
+# Ini akan otomatis membuat CNAME record di Cloudflare DNS
+cloudflared tunnel route dns kekkon kekkon.yourdomain.com
+```
+
+#### 6. Setup Environment Production
+
+Edit `server/.env`:
+```env
+PORT=5000
+JWT_SECRET=your-secure-random-string-min-32-chars
+NODE_ENV=production
+FRONTEND_URL=https://kekkon.yourdomain.com
+
+# Superadmin credentials
+SUPERADMIN_EMAIL=admin@yourdomain.com
+SUPERADMIN_PASSWORD=your-secure-password
 ```
 
 #### 7. Build & Jalankan
 
+**Terminal 1 - Build & Start Server:**
 ```bash
 # Build frontend
 cd client
 npm run build
 
-# Copy hasil build ke server
-# (atau setup serve static di Express)
-
-# Jalankan server
+# Start server (production mode)
 cd ../server
-npm start
+NODE_ENV=production npm start
+```
 
-# Di terminal lain, jalankan tunnel
-cloudflared tunnel run wedding-app
+**Terminal 2 - Start Tunnel:**
+```bash
+cloudflared tunnel run kekkon
+```
+
+Website akan accessible di `https://kekkon.yourdomain.com`
+
+#### 8. (Opsional) Auto-start Tunnel sebagai Service
+
+```bash
+# Install sebagai system service
+sudo cloudflared service install
+
+# Start service
+sudo systemctl start cloudflared
+sudo systemctl enable cloudflared
 ```
 
 ### Metode 2: Port Forwarding + Dynamic DNS
@@ -468,6 +527,9 @@ npm run build
 ### 4. Setup Environment Production
 
 ```bash
+# Generate random JWT secret
+openssl rand -hex 32
+
 # Buat file .env untuk production
 cd /var/www/kekkon/server
 nano .env
@@ -476,14 +538,13 @@ nano .env
 Isi `.env`:
 ```env
 PORT=5000
-JWT_SECRET=GENERATE-RANDOM-STRING-64-CHARS
+JWT_SECRET=paste-hasil-openssl-rand-disini
 NODE_ENV=production
 FRONTEND_URL=https://undangan.domain.com
-```
 
-Generate random string:
-```bash
-openssl rand -hex 32
+# Superadmin Dashboard
+SUPERADMIN_EMAIL=admin@undangan.domain.com
+SUPERADMIN_PASSWORD=your-very-secure-password
 ```
 
 ### 5. Setup PM2
@@ -670,6 +731,51 @@ chmod +x /root/update-kekkon.sh
 
 ---
 
+## 🧹 Maintenance
+
+### Cleanup Expired Invitations
+
+Undangan yang sudah expired (lebih dari 3 bulan) dapat dihapus otomatis:
+
+```bash
+# Manual cleanup
+cd /var/www/kekkon/server
+npm run cleanup
+```
+
+#### Setup Cron Job (Otomatis setiap hari jam 3 pagi)
+
+```bash
+crontab -e
+
+# Tambahkan baris ini:
+0 3 * * * cd /var/www/kekkon/server && npm run cleanup >> /var/log/kekkon-cleanup.log 2>&1
+```
+
+### Database Refresh (Development Only)
+
+**WARNING: Ini akan menghapus semua data!**
+
+```bash
+cd server
+npm run db:refresh
+```
+
+### Monitor Logs
+
+```bash
+# PM2 logs
+pm2 logs kekkon-api
+
+# Real-time monitoring
+pm2 monit
+
+# Nginx logs
+tail -f /var/log/nginx/error.log
+```
+
+---
+
 ## 🔐 Environment Variables
 
 ### Server (.env)
@@ -680,6 +786,8 @@ chmod +x /root/update-kekkon.sh
 | `JWT_SECRET` | Secret key untuk JWT (min 32 chars) | `abc123...` |
 | `NODE_ENV` | Environment mode | `development` / `production` |
 | `FRONTEND_URL` | URL frontend untuk CORS | `https://undangan.domain.com` |
+| `SUPERADMIN_EMAIL` | Email untuk login admin | `admin@domain.com` |
+| `SUPERADMIN_PASSWORD` | Password untuk login admin | `securepassword` |
 
 ### Client
 

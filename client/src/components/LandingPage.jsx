@@ -1,11 +1,13 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Sparkles, Users, Share2, Palette, Music, Check, ArrowRight, Star, LayoutDashboard } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Sparkles, Users, Share2, Palette, Music, Check, ArrowRight, Star, LayoutDashboard, Menu, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { KekkonLogo, KekkonIcon } from './shared/Logo';
 
 export default function LandingPage() {
   const { user } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const features = [
     { icon: Palette, title: 'Template Cantik', desc: 'Pilih dari berbagai template modern dan elegan' },
     { icon: Users, title: 'Kelola Tamu', desc: 'RSVP otomatis dan manajemen daftar tamu' },
@@ -23,12 +25,14 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50 overflow-x-hidden">
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
           <KekkonLogo />
-          <div className="flex gap-3">
+          
+          {/* Desktop Menu */}
+          <div className="hidden sm:flex gap-3">
             {user ? (
               <Link 
                 to="/dashboard" 
@@ -54,14 +58,64 @@ export default function LandingPage() {
               </>
             )}
           </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="sm:hidden p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-colors"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
+
+        {/* Mobile Menu Dropdown */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="sm:hidden bg-white border-t border-gray-100 overflow-hidden"
+            >
+              <div className="px-4 py-4 space-y-3">
+                {user ? (
+                  <Link 
+                    to="/dashboard" 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-center gap-2 w-full px-5 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-xl"
+                  >
+                    <LayoutDashboard className="w-4 h-4" />
+                    Dashboard
+                  </Link>
+                ) : (
+                  <>
+                    <Link 
+                      to="/login" 
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block w-full px-5 py-3 text-center text-gray-600 font-medium rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors"
+                    >
+                      Masuk
+                    </Link>
+                    <Link 
+                      to="/register" 
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block w-full px-5 py-3 text-center bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-xl"
+                    >
+                      Daftar Gratis
+                    </Link>
+                  </>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-4 relative overflow-hidden">
         {/* Background decorations */}
-        <div className="absolute top-20 left-10 w-72 h-72 bg-amber-200/30 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-orange-200/30 rounded-full blur-3xl" />
+        <div className="absolute top-20 -left-20 w-72 h-72 bg-amber-200/30 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-20 -right-20 w-72 sm:w-96 h-72 sm:h-96 bg-orange-200/30 rounded-full blur-3xl pointer-events-none" />
         
         <div className="max-w-5xl mx-auto text-center relative z-10">
           <motion.div
@@ -192,7 +246,7 @@ export default function LandingPage() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-24 bg-gradient-to-br from-amber-50 to-orange-50">
+      <section className="py-24 bg-gradient-to-br from-amber-50 to-orange-50 overflow-hidden">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <motion.div
@@ -233,7 +287,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="relative"
+              className="relative overflow-hidden"
             >
               <div className="bg-white rounded-3xl p-8 shadow-2xl shadow-amber-200/50">
                 <div className="flex items-center gap-4 mb-6">
@@ -321,6 +375,9 @@ export default function LandingPage() {
               </Link>
               <Link to="/privacy" className="text-gray-600 hover:text-amber-600 transition-colors">
                 Kebijakan Privasi
+              </Link>
+              <Link to="/terms" className="text-gray-600 hover:text-amber-600 transition-colors">
+                Syarat & Ketentuan
               </Link>
             </div>
             <div className="text-center">

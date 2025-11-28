@@ -12,6 +12,9 @@ import InvitationPage from './components/public/InvitationPage';
 import ProtectedRoute from './components/shared/ProtectedRoute';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import AboutUs from './components/AboutUs';
+import TermsConditions from './components/TermsConditions';
+import AdminLogin from './components/superadmin/AdminLogin';
+import AdminDashboard from './components/superadmin/AdminDashboard';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -49,11 +52,16 @@ function AppRoutes() {
       <Route path="/register" element={<AuthRoute><Register /></AuthRoute>} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/about" element={<AboutUs />} />
+      <Route path="/terms" element={<TermsConditions />} />
       
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/create" element={<ProtectedRoute><InvitationEditor /></ProtectedRoute>} />
       <Route path="/edit/:id" element={<ProtectedRoute><InvitationEditor /></ProtectedRoute>} />
       <Route path="/guests/:id" element={<ProtectedRoute><GuestManager /></ProtectedRoute>} />
+      
+      {/* Superadmin Routes */}
+      <Route path="/superadmin" element={<AdminLogin />} />
+      <Route path="/superadmin/dashboard" element={<AdminDashboard />} />
       
       <Route path="/:slug" element={<InvitationPage />} />
     </Routes>

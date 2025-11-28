@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { publicAPI } from '../../utils/api';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Volume2, VolumeX, ChevronDown, Heart } from 'lucide-react';
+import { Volume2, VolumeX, ChevronDown, Heart, Home, Users, Calendar, Image, Gift, MessageSquare } from 'lucide-react';
 import HeroSection from './sections/HeroSection';
 import CoupleSection from './sections/CoupleSection';
 import EventSection from './sections/EventSection';
@@ -12,6 +12,7 @@ import RSVPSection from './sections/RSVPSection';
 import Footer from './sections/Footer';
 import { AdPlaceholder } from '../shared/AdUnit';
 import ScrollTimeline from './ScrollTimeline';
+import { KekkonIcon } from '../shared/Logo';
 import { 
   LoadingScreen, 
   CurtainReveal, 
@@ -39,6 +40,49 @@ export default function InvitationPage() {
   useEffect(() => {
     loadInvitation();
   }, [slug]);
+
+  // Update meta tags for social sharing
+  useEffect(() => {
+    if (invitation) {
+      const baseUrl = window.location.origin;
+      const ogImageUrl = `${baseUrl}/api/public/${slug}/og-image`;
+      const pageUrl = `${baseUrl}/i/${slug}`;
+      const title = `Undangan Pernikahan ${invitation.bride_name} & ${invitation.groom_name}`;
+      const description = invitation.wedding_date 
+        ? `Kami mengundang Anda untuk hadir di pernikahan kami pada ${new Date(invitation.wedding_date).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`
+        : 'Kami mengundang Anda untuk hadir di pernikahan kami';
+
+      document.title = title;
+      
+      // Update or create meta tags
+      const updateMeta = (property, content, isName = false) => {
+        const attr = isName ? 'name' : 'property';
+        let meta = document.querySelector(`meta[${attr}="${property}"]`);
+        if (!meta) {
+          meta = document.createElement('meta');
+          meta.setAttribute(attr, property);
+          document.head.appendChild(meta);
+        }
+        meta.setAttribute('content', content);
+      };
+
+      updateMeta('og:title', title);
+      updateMeta('og:description', description);
+      updateMeta('og:image', ogImageUrl);
+      updateMeta('og:image:width', '1200');
+      updateMeta('og:image:height', '630');
+      updateMeta('og:url', pageUrl);
+      updateMeta('og:type', 'website');
+      
+      // Twitter cards
+      updateMeta('twitter:card', 'summary_large_image', true);
+      updateMeta('twitter:title', title, true);
+      updateMeta('twitter:description', description, true);
+      updateMeta('twitter:image', ogImageUrl, true);
+      
+      updateMeta('description', description, true);
+    }
+  }, [invitation, slug]);
 
   const loadInvitation = async () => {
     try {
@@ -101,6 +145,24 @@ export default function InvitationPage() {
     '--primary-color': invitation.primary_color || '#D4A373',
     '--secondary-color': invitation.secondary_color || '#FEFAE0',
   };
+
+  // Check if gift section has content
+  const hasGift = (invitation.gift_bank_accounts?.length > 0) || 
+                  (invitation.gift_ewallets?.length > 0) || 
+                  !!invitation.gift_address;
+  
+  // Check if gallery has images
+  const hasGallery = invitation.gallery_images?.length > 0;
+
+  // Build navigation items based on available content
+  const navItems = [
+    { id: 'home', label: 'Home', icon: Home },
+    { id: 'mempelai', label: 'Mempelai', icon: Users },
+    { id: 'acara', label: 'Acara', icon: Calendar },
+    ...(hasGallery ? [{ id: 'gallery', label: 'Gallery', icon: Image }] : []),
+    ...(hasGift ? [{ id: 'gift', label: 'Hadiah', icon: Gift }] : []),
+    ...(invitation.enable_rsvp ? [{ id: 'rsvp', label: 'RSVP', icon: MessageSquare }] : []),
+  ];
 
   return (
     <div className="invitation-page" style={cssVars}>
@@ -169,8 +231,9 @@ export default function InvitationPage() {
           <ScrollTimeline 
             templateId={invitation.template_id}
             primaryColor={invitation.primary_color}
-            hasGallery={invitation.gallery_images?.length > 0}
-            hasGift={invitation.enable_gift}
+            hasGallery={hasGallery}
+            hasGift={hasGift}
+            hasRsvp={invitation.enable_rsvp}
           />
 
           {invitation.music_url && (
@@ -190,17 +253,30 @@ export default function InvitationPage() {
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 1.2, type: "spring" }}
-            className="fixed top-0 left-0 right-0 z-30 bg-white/90 backdrop-blur-sm shadow-sm"
+            className="fixed top-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md shadow-sm"
           >
-            <div className="max-w-4xl mx-auto px-4 py-3">
-              <div className="flex justify-center gap-4 md:gap-6 text-sm overflow-x-auto">
-                {['home', 'mempelai', 'acara', 'gallery', 'gift', 'rsvp'].map((section) => (
+            <div className="max-w-4xl mx-auto px-2 sm:px-4 py-2">
+              <div className="flex justify-center items-center gap-1 sm:gap-2">
+                {/* Kekkon Logo */}
+                <Link 
+                  to="/" 
+                  className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full hover:bg-amber-50 transition-colors mr-1 sm:mr-2"
+                  title="Kekkon - Undangan Pernikahan Digital"
+                >
+                  <KekkonIcon size={28} id="nav-logo" />
+                </Link>
+                
+                <div className="w-px h-6 bg-gray-200 mr-1 sm:mr-2" />
+                
+                {navItems.map((section) => (
                   <a
-                    key={section}
-                    href={`#${section}`}
-                    className="capitalize text-gray-600 hover:text-gray-900 transition-colors whitespace-nowrap"
+                    key={section.id}
+                    href={`#${section.id}`}
+                    className="flex items-center gap-1.5 px-2 sm:px-3 py-2 rounded-full text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-all text-xs sm:text-sm"
+                    style={{ '--hover-color': invitation.primary_color }}
                   >
-                    {section === 'gift' ? 'Hadiah' : section}
+                    <section.icon className="w-4 h-4 flex-shrink-0" />
+                    <span className="hidden sm:inline">{section.label}</span>
                   </a>
                 ))}
               </div>
@@ -217,12 +293,12 @@ export default function InvitationPage() {
             </div>
             
             <EventSection invitation={invitation} />
-            {invitation.gallery_images?.length > 0 && (
+            {hasGallery && (
               <GallerySection invitation={invitation} />
             )}
             
             {/* Gift Section */}
-            <GiftSection invitation={invitation} />
+            {hasGift && <GiftSection invitation={invitation} />}
             
             {/* Ad before RSVP */}
             <div className="py-4" style={{ backgroundColor: invitation.secondary_color }}>
