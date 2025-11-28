@@ -4,16 +4,16 @@ nixPkgs = ["nodejs_20", "python311"]
 
 [phases.install]
 cmds = [
-  "npm install",
-  "cd client && npm install", 
-  "cd ../server && npm install"
+  "npm ci || npm install",
+  "cd /app/client && npm ci || npm install", 
+  "cd /app/server && npm ci || npm install"
 ]
 
 [phases.build]
-cmds = ["cd client && npm run build"]
+cmds = ["cd /app/client && npm run build"]
 
 [start]
-cmd = "cd server && node server.js"
+cmd = "cd /app/server && node server.js"
 
 [variables]
 NODE_ENV = "production"
