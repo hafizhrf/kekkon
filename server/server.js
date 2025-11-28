@@ -25,6 +25,22 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Validate required environment variables
+const requiredEnvVars = ['JWT_SECRET'];
+const missingEnvVars = requiredEnvVars.filter(v => !process.env[v]);
+if (missingEnvVars.length > 0) {
+  console.error('❌ Missing required environment variables:', missingEnvVars.join(', '));
+  console.error('Please set them in Railway Dashboard > Variables');
+  process.exit(1);
+}
+
+// Set defaults for optional env vars
+process.env.NODE_ENV = process.env.NODE_ENV || 'production';
+process.env.FRONTEND_URL = process.env.FRONTEND_URL || '*';
+
+console.log('🔧 Environment:', process.env.NODE_ENV);
+console.log('🌐 Frontend URL:', process.env.FRONTEND_URL);
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
