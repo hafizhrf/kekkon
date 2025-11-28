@@ -1,0 +1,28 @@
+[build]
+builder = "nixpacks"
+
+[build.nixpacksPlan]
+providers = ["node"]
+
+[build.nixpacksPlan.phases.setup]
+nixPkgs = ["nodejs_20", "python311", "gcc", "gnumake"]
+
+[build.nixpacksPlan.phases.install]
+cmds = [
+  "npm install",
+  "cd client && npm install",
+  "cd ../server && npm install"
+]
+
+[build.nixpacksPlan.phases.build]
+cmds = ["cd client && npm run build"]
+
+[deploy]
+startCommand = "cd server && npm start"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 100
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+
+[deploy.resources]
+memory = "512Mi"

@@ -41,48 +41,12 @@ export default function InvitationPage() {
     loadInvitation();
   }, [slug]);
 
-  // Update meta tags for social sharing
+  // Update document title
   useEffect(() => {
     if (invitation) {
-      const baseUrl = window.location.origin;
-      const ogImageUrl = `${baseUrl}/api/public/${slug}/og-image`;
-      const pageUrl = `${baseUrl}/i/${slug}`;
-      const title = `Undangan Pernikahan ${invitation.bride_name} & ${invitation.groom_name}`;
-      const description = invitation.wedding_date 
-        ? `Kami mengundang Anda untuk hadir di pernikahan kami pada ${new Date(invitation.wedding_date).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`
-        : 'Kami mengundang Anda untuk hadir di pernikahan kami';
-
-      document.title = title;
-      
-      // Update or create meta tags
-      const updateMeta = (property, content, isName = false) => {
-        const attr = isName ? 'name' : 'property';
-        let meta = document.querySelector(`meta[${attr}="${property}"]`);
-        if (!meta) {
-          meta = document.createElement('meta');
-          meta.setAttribute(attr, property);
-          document.head.appendChild(meta);
-        }
-        meta.setAttribute('content', content);
-      };
-
-      updateMeta('og:title', title);
-      updateMeta('og:description', description);
-      updateMeta('og:image', ogImageUrl);
-      updateMeta('og:image:width', '1200');
-      updateMeta('og:image:height', '630');
-      updateMeta('og:url', pageUrl);
-      updateMeta('og:type', 'website');
-      
-      // Twitter cards
-      updateMeta('twitter:card', 'summary_large_image', true);
-      updateMeta('twitter:title', title, true);
-      updateMeta('twitter:description', description, true);
-      updateMeta('twitter:image', ogImageUrl, true);
-      
-      updateMeta('description', description, true);
+      document.title = `Undangan Pernikahan ${invitation.bride_name} & ${invitation.groom_name}`;
     }
-  }, [invitation, slug]);
+  }, [invitation]);
 
   const loadInvitation = async () => {
     try {

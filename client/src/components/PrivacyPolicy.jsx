@@ -69,14 +69,14 @@ Jika Anda ingin menghapus seluruh akun, silakan hubungi kami.`
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors duration-300">
       {/* Navbar */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
+      <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-100 dark:border-slate-700 sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
           <KekkonLogo />
           <Link 
             to="/"
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
+            className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Kembali
@@ -94,14 +94,14 @@ Jika Anda ingin menghapus seluruh akun, silakan hubungi kami.`
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl mb-6">
               <Shield className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white mb-4">
               Kebijakan Privasi
             </h1>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               Kami menghargai privasi Anda. Dokumen ini menjelaskan bagaimana Kekkon 
               mengumpulkan, menggunakan, dan melindungi data pribadi Anda.
             </p>
-            <p className="text-sm text-gray-400 mt-4">
+            <p className="text-sm text-gray-400 dark:text-gray-500 mt-4">
               Terakhir diperbarui: {new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
             </p>
           </div>
@@ -114,17 +114,17 @@ Jika Anda ingin menghapus seluruh akun, silakan hubungi kami.`
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100"
+                className="bg-white dark:bg-slate-800 rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-700"
               >
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-amber-100 to-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <section.icon className="w-6 h-6 text-amber-600" />
+                  <div className="w-12 h-12 bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-500/20 dark:to-orange-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <section.icon className="w-6 h-6 text-amber-600 dark:text-amber-400" />
                   </div>
                   <div className="flex-1">
-                    <h2 className="text-xl font-bold text-gray-800 mb-3">
+                    <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-3">
                       {section.title}
                     </h2>
-                    <div className="text-gray-600 whitespace-pre-line leading-relaxed">
+                    <div className="text-gray-600 dark:text-gray-300 whitespace-pre-line leading-relaxed">
                       {section.content}
                     </div>
                   </div>
@@ -134,15 +134,15 @@ Jika Anda ingin menghapus seluruh akun, silakan hubungi kami.`
           </div>
 
           {/* Contact */}
-          <div className="mt-12 text-center p-8 bg-white rounded-2xl border border-gray-100">
-            <h3 className="text-lg font-bold text-gray-800 mb-2">Ada Pertanyaan?</h3>
-            <p className="text-gray-600 mb-4">
+          <div className="mt-12 text-center p-8 bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700">
+            <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-2">Ada Pertanyaan?</h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
               Jika Anda memiliki pertanyaan tentang kebijakan privasi ini, 
               silakan hubungi kami.
             </p>
             <a 
               href="mailto:privacy@kekkon.id"
-              className="text-amber-600 hover:text-amber-700 font-medium"
+              className="text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 font-medium"
             >
               privacy@kekkon.id
             </a>
@@ -151,10 +151,10 @@ Jika Anda ingin menghapus seluruh akun, silakan hubungi kami.`
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-100 py-8 mt-12">
+      <footer className="bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-700 py-8 mt-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <KekkonLogo linkTo="/" className="justify-center mb-4" />
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             &copy; {new Date().getFullYear()} Kekkon. All rights reserved.
           </p>
         </div>

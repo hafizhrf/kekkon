@@ -1,0 +1,862 @@
+openapi: 3.0.3
+info:
+  title: Kekkon API
+  description: API untuk aplikasi undangan pernikahan digital Kekkon
+  version: 1.0.0
+  contact:
+    name: Kekkon Support
+    url: https://kekkon.hafizhrf.me
+
+servers:
+  - url: http://localhost:5000
+    description: Development server
+  - url: https://kekkon.hafizhrf.me
+    description: Production server
+
+tags:
+  - name: Auth
+    description: Authentication endpoints
+  - name: Invitations
+    description: Invitation management
+  - name: Guests
+    description: Guest management
+  - name: Upload
+    description: File upload endpoints
+  - name: Templates
+    description: Template endpoints
+  - name: Public
+    description: Public endpoints (no auth required)
+  - name: Admin
+    description: Admin dashboard endpoints
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    AdminAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    Invitation:
+      type: object
+      properties:
+        id:
+          type: string
+        slug:
+          type: string
+        template_id:
+          type: string
+        bride_name:
+          type: string
+        groom_name:
+          type: string
+        wedding_date:
+          type: string
+          format: date
+        akad_time:
+          type: string
+        akad_venue:
+          type: string
+        akad_address:
+          type: string
+        reception_time:
+          type: string
+        reception_venue:
+          type: string
+        reception_address:
+          type: string
+        primary_color:
+          type: string
+        secondary_color:
+          type: string
+        gallery_images:
+          type: array
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+              caption:
+                type: string
+        gift_bank_accounts:
+          type: array
+          items:
+            type: object
+            properties:
+              bank:
+                type: string
+              number:
+                type: string
+              name:
+                type: string
+
+    Guest:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        phone:
+          type: string
+        rsvp_status:
+          type: string
+          enum: [pending, attending, not_attending]
+        guests_count:
+          type: integer
+        message:
+          type: string
+
+    Template:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        thumbnail:
+          type: string
+        category:
+          type: string
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+
+paths:
+  # Auth
+  /api/auth/register:
+    post:
+      tags: [Auth]
+      summary: Register new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password]
+              properties:
+                name:
+                  type: string
+                  minLength: 2
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 6
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  token:
+                    type: string
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Invalid credentials
+
+  /api/auth/profile:
+    get:
+      tags: [Auth]
+      summary: Get current user profile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  # Invitations
+  /api/invitations:
+    get:
+      tags: [Invitations]
+      summary: Get all invitations for current user
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of invitations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  invitations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Invitation'
+
+    post:
+      tags: [Invitations]
+      summary: Create new invitation
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [template_id, bride_name, groom_name]
+              properties:
+                template_id:
+                  type: string
+                bride_name:
+                  type: string
+                groom_name:
+                  type: string
+                wedding_date:
+                  type: string
+                  format: date
+                akad_time:
+                  type: string
+                akad_venue:
+                  type: string
+                akad_address:
+                  type: string
+                reception_time:
+                  type: string
+                reception_venue:
+                  type: string
+                reception_address:
+                  type: string
+                primary_color:
+                  type: string
+                secondary_color:
+                  type: string
+      responses:
+        '201':
+          description: Invitation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invitation'
+
+  /api/invitations/{id}:
+    get:
+      tags: [Invitations]
+      summary: Get invitation by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Invitation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invitation'
+        '404':
+          description: Invitation not found
+
+    put:
+      tags: [Invitations]
+      summary: Update invitation
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Invitation'
+      responses:
+        '200':
+          description: Invitation updated
+
+    delete:
+      tags: [Invitations]
+      summary: Delete invitation
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Invitation deleted
+
+  /api/invitations/{id}/publish:
+    post:
+      tags: [Invitations]
+      summary: Publish invitation
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Invitation published
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  slug:
+                    type: string
+
+  /api/invitations/{id}/analytics:
+    get:
+      tags: [Invitations]
+      summary: Get invitation analytics
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Analytics data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalViews:
+                    type: integer
+                  rsvpStats:
+                    type: object
+                  recentMessages:
+                    type: array
+                  viewsByDay:
+                    type: array
+
+  # Guests
+  /api/invitations/{id}/guests:
+    get:
+      tags: [Guests]
+      summary: Get guests for invitation
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of guests
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  guests:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Guest'
+
+    post:
+      tags: [Guests]
+      summary: Add guest
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                phone:
+                  type: string
+      responses:
+        '201':
+          description: Guest added
+
+  /api/invitations/{id}/guests/bulk:
+    post:
+      tags: [Guests]
+      summary: Bulk add guests
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                guests:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      phone:
+                        type: string
+      responses:
+        '201':
+          description: Guests added
+
+  /api/guests/{id}:
+    put:
+      tags: [Guests]
+      summary: Update guest
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Guest'
+      responses:
+        '200':
+          description: Guest updated
+
+    delete:
+      tags: [Guests]
+      summary: Delete guest
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Guest deleted
+
+  # Upload
+  /api/upload/image:
+    post:
+      tags: [Upload]
+      summary: Upload image
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Image uploaded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+
+  /api/upload/music:
+    post:
+      tags: [Upload]
+      summary: Upload music
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                music:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Music uploaded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+
+  # Templates
+  /api/templates:
+    get:
+      tags: [Templates]
+      summary: Get all templates
+      responses:
+        '200':
+          description: List of templates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  templates:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Template'
+
+  /api/templates/{id}:
+    get:
+      tags: [Templates]
+      summary: Get template by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Template details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Template'
+
+  # Public
+  /api/public/{slug}:
+    get:
+      tags: [Public]
+      summary: Get public invitation
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: to
+          in: query
+          schema:
+            type: string
+          description: Guest name for personalization
+      responses:
+        '200':
+          description: Public invitation data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  invitation:
+                    $ref: '#/components/schemas/Invitation'
+                  guestName:
+                    type: string
+
+  /api/public/{slug}/rsvp:
+    post:
+      tags: [Public]
+      summary: Submit RSVP
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, status]
+              properties:
+                name:
+                  type: string
+                status:
+                  type: string
+                  enum: [attending, not_attending]
+                guests_count:
+                  type: integer
+                message:
+                  type: string
+      responses:
+        '200':
+          description: RSVP submitted
+
+  /api/public/{slug}/messages:
+    get:
+      tags: [Public]
+      summary: Get public messages/wishes
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messages:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        message:
+                          type: string
+                        created_at:
+                          type: string
+
+  /api/public/{slug}/og-image:
+    get:
+      tags: [Public]
+      summary: Get OG image for social sharing
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: PNG image
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+
+  # Admin
+  /api/admin/login:
+    post:
+      tags: [Admin]
+      summary: Admin login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Admin login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  admin:
+                    type: object
+
+  /api/admin/stats:
+    get:
+      tags: [Admin]
+      summary: Get dashboard statistics
+      security:
+        - AdminAuth: []
+      responses:
+        '200':
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalUsers:
+                    type: integer
+                  totalInvitations:
+                    type: integer
+                  totalRsvp:
+                    type: integer
+
+  /api/admin/users:
+    get:
+      tags: [Admin]
+      summary: Get all users
+      security:
+        - AdminAuth: []
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+
+  /api/admin/users/{id}:
+    delete:
+      tags: [Admin]
+      summary: Delete user
+      security:
+        - AdminAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User deleted
+
+  /api/admin/invitations:
+    get:
+      tags: [Admin]
+      summary: Get all invitations (admin)
+      security:
+        - AdminAuth: []
+      responses:
+        '200':
+          description: List of all invitations
+
+  /api/admin/invitations/{id}:
+    delete:
+      tags: [Admin]
+      summary: Delete invitation (admin)
+      security:
+        - AdminAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Invitation deleted
+
+  # Health
+  /api/health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: Server is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  timestamp:
+                    type: string
+                  uptime:
+                    type: number

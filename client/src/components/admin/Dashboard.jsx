@@ -12,6 +12,7 @@ import { QRCodeCanvas } from 'qrcode.react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { KekkonLogo } from '../shared/Logo';
+import ThemeToggle from '../shared/ThemeToggle';
 
 export default function Dashboard() {
   const [invitations, setInvitations] = useState([]);
@@ -201,22 +202,23 @@ export default function Dashboard() {
   const totalGuests = invitations.reduce((sum, inv) => sum + (inv.attending_count || 0), 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50/30">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50/30 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors duration-300">
       {/* Navbar */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-20">
+      <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-100 dark:border-slate-700 sticky top-0 z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <KekkonLogo />
             <div className="flex items-center gap-4">
-              <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl">
+              <ThemeToggle />
+              <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-slate-700 rounded-xl">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-sm font-medium">
                   {user?.name?.charAt(0) || user?.email?.charAt(0) || 'U'}
                 </div>
-                <span className="text-gray-700 font-medium">{user?.name || user?.email}</span>
+                <span className="text-gray-700 dark:text-gray-200 font-medium">{user?.name || user?.email}</span>
               </div>
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-colors"
+                className="flex items-center gap-2 px-4 py-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl transition-colors"
               >
                 <LogOut className="w-4 h-4" />
                 <span className="hidden md:inline">Keluar</span>
@@ -239,15 +241,15 @@ export default function Dashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-6 shadow-sm border border-gray-100"
+              className="bg-white dark:bg-slate-800 rounded-xl sm:rounded-2xl p-3 sm:p-6 shadow-sm border border-gray-100 dark:border-slate-700"
             >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
                 <div className="order-2 sm:order-1">
-                  <p className="text-[10px] sm:text-sm text-gray-500 mb-0.5 sm:mb-1">
+                  <p className="text-[10px] sm:text-sm text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1">
                     <span className="sm:hidden">{stat.label}</span>
                     <span className="hidden sm:inline">{stat.labelFull}</span>
                   </p>
-                  <p className="text-xl sm:text-3xl font-bold text-gray-800">{stat.value}</p>
+                  <p className="text-xl sm:text-3xl font-bold text-gray-800 dark:text-white">{stat.value}</p>
                 </div>
                 <div className={`order-1 sm:order-2 w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center`}>
                   <stat.icon className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
@@ -260,12 +262,12 @@ export default function Dashboard() {
         {/* Header */}
         <div className="flex items-center justify-between gap-4 mb-4 sm:mb-6">
           <div>
-            <h2 className="text-lg sm:text-2xl font-bold text-gray-800">Undangan Saya</h2>
-            <p className="text-xs sm:text-base text-gray-500 hidden sm:block">Kelola semua undangan pernikahan Anda</p>
+            <h2 className="text-lg sm:text-2xl font-bold text-gray-800 dark:text-white">Undangan Saya</h2>
+            <p className="text-xs sm:text-base text-gray-500 dark:text-gray-400 hidden sm:block">Kelola semua undangan pernikahan Anda</p>
           </div>
           <Link 
             to="/create" 
-            className="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg sm:rounded-xl text-sm sm:text-base font-semibold hover:shadow-lg hover:shadow-amber-200 transition-all"
+            className="inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg sm:rounded-xl text-sm sm:text-base font-semibold hover:shadow-lg hover:shadow-amber-200 dark:hover:shadow-amber-500/20 transition-all"
           >
             <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
             <span className="hidden sm:inline">Buat Undangan</span>
@@ -277,26 +279,26 @@ export default function Dashboard() {
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
-              <div className="w-16 h-16 border-4 border-amber-200 border-t-amber-500 rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-gray-500">Memuat undangan...</p>
+              <div className="w-16 h-16 border-4 border-amber-200 dark:border-amber-500/30 border-t-amber-500 rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-500 dark:text-gray-400">Memuat undangan...</p>
             </div>
           </div>
         ) : invitations.length === 0 ? (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-3xl border border-gray-100 text-center py-16 px-6"
+            className="bg-white dark:bg-slate-800 rounded-3xl border border-gray-100 dark:border-slate-700 text-center py-16 px-6"
           >
-            <div className="w-24 h-24 bg-gradient-to-br from-amber-100 to-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-24 h-24 bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-500/20 dark:to-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
               <Sparkles className="w-12 h-12 text-amber-500" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-3">Belum Ada Undangan</h3>
-            <p className="text-gray-500 mb-8 max-w-md mx-auto">
+            <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-3">Belum Ada Undangan</h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto">
               Mulai buat undangan pernikahan digital pertama Anda dengan template cantik dan fitur lengkap
             </p>
             <Link 
               to="/create" 
-              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-200 transition-all"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-200 dark:hover:shadow-amber-500/20 transition-all"
             >
               <Plus className="w-5 h-5" />
               Buat Undangan Pertama
@@ -310,7 +312,7 @@ export default function Dashboard() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 p-3 sm:p-5 hover:shadow-md transition-shadow"
+                className="bg-white dark:bg-slate-800 rounded-xl sm:rounded-2xl border border-gray-100 dark:border-slate-700 p-3 sm:p-5 hover:shadow-md transition-shadow"
               >
                 {/* Mobile Layout */}
                 <div className="sm:hidden">
@@ -320,19 +322,19 @@ export default function Dashboard() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
-                        <h3 className="font-bold text-sm text-gray-800 leading-tight">
+                        <h3 className="font-bold text-sm text-gray-800 dark:text-white leading-tight">
                           {inv.bride_name} & {inv.groom_name}
                         </h3>
                         <span className={`px-2 py-0.5 text-[10px] font-medium rounded-full flex-shrink-0 ${
                           inv.status === 'published' 
-                            ? 'bg-emerald-100 text-emerald-700' 
-                            : 'bg-amber-100 text-amber-700'
+                            ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400' 
+                            : 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400'
                         }`}>
                           {inv.status === 'published' ? 'Live' : 'Draft'}
                         </span>
                       </div>
                       {inv.wedding_date && (
-                        <p className="text-[11px] text-gray-500 mt-1 flex items-center gap-1">
+                        <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
                           {format(new Date(inv.wedding_date), 'd MMM yyyy', { locale: id })}
                         </p>
@@ -341,7 +343,7 @@ export default function Dashboard() {
                   </div>
                   
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3 text-[11px] text-gray-500">
+                    <div className="flex items-center gap-3 text-[11px] text-gray-500 dark:text-gray-400">
                       <span className="flex items-center gap-1">
                         <Eye className="w-3 h-3" /> {inv.view_count || 0}
                       </span>
@@ -363,19 +365,19 @@ export default function Dashboard() {
                             href={`/${inv.slug}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-2 bg-gray-100 text-gray-600 rounded-lg"
+                            className="p-2 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 rounded-lg"
                           >
                             <ExternalLink className="w-4 h-4" />
                           </a>
                         </>
                       )}
-                      <Link to={`/edit/${inv.id}`} className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
+                      <Link to={`/edit/${inv.id}`} className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg">
                         <Edit className="w-4 h-4" />
                       </Link>
-                      <Link to={`/guests/${inv.id}`} className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
+                      <Link to={`/guests/${inv.id}`} className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg">
                         <Users className="w-4 h-4" />
                       </Link>
-                      <button onClick={() => setDeleteConfirm(inv)} className="p-2 text-gray-500 hover:bg-rose-50 hover:text-rose-600 rounded-lg">
+                      <button onClick={() => setDeleteConfirm(inv)} className="p-2 text-gray-500 dark:text-gray-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -390,18 +392,18 @@ export default function Dashboard() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-1">
-                        <h3 className="font-bold text-lg text-gray-800 truncate">
+                        <h3 className="font-bold text-lg text-gray-800 dark:text-white truncate">
                           {inv.bride_name} & {inv.groom_name}
                         </h3>
                         <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${
                           inv.status === 'published' 
-                            ? 'bg-emerald-100 text-emerald-700' 
-                            : 'bg-amber-100 text-amber-700'
+                            ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400' 
+                            : 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400'
                         }`}>
                           {inv.status === 'published' ? 'Published' : 'Draft'}
                         </span>
                       </div>
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                         {inv.wedding_date && (
                           <span className="flex items-center gap-1.5">
                             <Calendar className="w-4 h-4" />
@@ -432,7 +434,7 @@ export default function Dashboard() {
                           href={`/${inv.slug}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors"
+                          className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-medium hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
                         >
                           <ExternalLink className="w-4 h-4" />
                           <span className="hidden md:inline">Lihat</span>
@@ -441,21 +443,21 @@ export default function Dashboard() {
                     )}
                     <Link
                       to={`/edit/${inv.id}`}
-                      className="p-2.5 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors"
+                      className="p-2.5 text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-xl transition-colors"
                       title="Edit"
                     >
                       <Edit className="w-5 h-5" />
                     </Link>
                     <Link
                       to={`/guests/${inv.id}`}
-                      className="p-2.5 text-gray-500 hover:text-violet-600 hover:bg-violet-50 rounded-xl transition-colors"
+                      className="p-2.5 text-gray-500 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-500/10 rounded-xl transition-colors"
                       title="Kelola Tamu"
                     >
                       <Users className="w-5 h-5" />
                     </Link>
                     <button
                       onClick={() => setDeleteConfirm(inv)}
-                      className="p-2.5 text-gray-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
+                      className="p-2.5 text-gray-500 dark:text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl transition-colors"
                       title="Hapus"
                     >
                       <Trash2 className="w-5 h-5" />
@@ -483,20 +485,20 @@ export default function Dashboard() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl"
+              className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-md w-full shadow-xl"
             >
               <div className="text-center">
-                <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Trash2 className="w-8 h-8 text-rose-600" />
+                <div className="w-16 h-16 bg-rose-100 dark:bg-rose-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Trash2 className="w-8 h-8 text-rose-600 dark:text-rose-400" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Hapus Undangan?</h3>
-                <p className="text-gray-500 mb-6">
-                  Undangan <strong>{deleteConfirm.bride_name} & {deleteConfirm.groom_name}</strong> akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.
+                <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">Hapus Undangan?</h3>
+                <p className="text-gray-500 dark:text-gray-400 mb-6">
+                  Undangan <strong className="dark:text-gray-200">{deleteConfirm.bride_name} & {deleteConfirm.groom_name}</strong> akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.
                 </p>
                 <div className="flex gap-3">
                   <button
                     onClick={() => setDeleteConfirm(null)}
-                    className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+                    className="flex-1 px-4 py-3 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
                   >
                     Batal
                   </button>
@@ -529,7 +531,7 @@ export default function Dashboard() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto"
+              className="bg-white dark:bg-slate-800 rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto"
             >
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
@@ -538,21 +540,21 @@ export default function Dashboard() {
                     <Share2 className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-800">Bagikan Undangan</h3>
-                    <p className="text-xs text-gray-500">{shareModal.bride_name} & {shareModal.groom_name}</p>
+                    <h3 className="font-bold text-gray-800 dark:text-white">Bagikan Undangan</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{shareModal.bride_name} & {shareModal.groom_name}</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setShareModal(null)}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-full transition-colors"
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                 </button>
               </div>
 
               {/* Guest Name Input */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <User className="w-4 h-4 inline mr-2 text-amber-500" />
                   Nama Tamu (Opsional)
                 </label>
@@ -561,16 +563,16 @@ export default function Dashboard() {
                   value={guestName}
                   onChange={(e) => setGuestName(e.target.value)}
                   placeholder="Contoh: Budi Santoso"
-                  className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-amber-500 transition-all"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 dark:text-white border-0 rounded-xl focus:ring-2 focus:ring-amber-500 transition-all"
                 />
-                <p className="text-xs text-gray-400 mt-2">
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
                   Nama akan ditampilkan di undangan sebagai tamu yang diundang
                 </p>
               </div>
 
               {/* QR Code */}
               <div className="flex justify-center mb-6" ref={qrRef}>
-                <div className="p-5 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50">
+                <div className="p-5 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-500/10 dark:to-orange-500/10">
                   <QRCodeCanvas
                     value={getInvitationUrl(shareModal.slug, guestName)}
                     size={180}
@@ -582,9 +584,9 @@ export default function Dashboard() {
               </div>
 
               {/* Link Preview */}
-              <div className="bg-gray-50 rounded-xl p-3 mb-6">
-                <p className="text-xs text-gray-500 mb-1">Link Undangan:</p>
-                <p className="text-sm text-gray-700 font-mono break-all">
+              <div className="bg-gray-50 dark:bg-slate-700 rounded-xl p-3 mb-6">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Link Undangan:</p>
+                <p className="text-sm text-gray-700 dark:text-gray-300 font-mono break-all">
                   {getInvitationUrl(shareModal.slug, guestName)}
                 </p>
               </div>
@@ -593,17 +595,17 @@ export default function Dashboard() {
               <div className="space-y-3">
                 <button
                   onClick={handleCopyLink}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3.5 bg-gray-100 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-colors"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3.5 bg-gray-100 dark:bg-slate-700 rounded-xl text-sm font-semibold hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
                 >
                   {copied ? (
                     <>
                       <Check className="w-5 h-5 text-green-500" />
-                      <span className="text-green-600">Link Berhasil Disalin!</span>
+                      <span className="text-green-600 dark:text-green-400">Link Berhasil Disalin!</span>
                     </>
                   ) : (
                     <>
-                      <Copy className="w-5 h-5 text-gray-600" />
-                      <span className="text-gray-700">Salin Link</span>
+                      <Copy className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                      <span className="text-gray-700 dark:text-gray-300">Salin Link</span>
                     </>
                   )}
                 </button>
@@ -626,8 +628,8 @@ export default function Dashboard() {
               </div>
 
               {/* Info */}
-              <div className="mt-6 p-4 bg-amber-50 rounded-xl">
-                <p className="text-xs text-amber-700">
+              <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-500/10 rounded-xl">
+                <p className="text-xs text-amber-700 dark:text-amber-300">
                   <strong>Tips:</strong> Isi nama tamu untuk membuat undangan personal. 
                   QR Code yang diunduh akan menyertakan nama pasangan dan tamu.
                 </p>

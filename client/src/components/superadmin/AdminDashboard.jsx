@@ -5,7 +5,7 @@ import { adminAPI } from '../../utils/api';
 import { 
   Shield, Users, FileText, Eye, UserCheck, LogOut, 
   Trash2, Search, ChevronDown, BarChart3, Calendar,
-  ExternalLink, AlertTriangle
+  ExternalLink, AlertTriangle, BookOpen
 } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -116,13 +116,24 @@ export default function AdminDashboard() {
                 <p className="text-xs text-slate-400">Superadmin Dashboard</p>
               </div>
             </div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-xl transition-all"
-            >
-              <LogOut className="w-4 h-4" />
-              <span className="hidden sm:inline">Logout</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <a
+                href={`/docs?token=${localStorage.getItem('adminToken')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-xl transition-all"
+              >
+                <BookOpen className="w-4 h-4" />
+                <span className="hidden sm:inline">API Docs</span>
+              </a>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-xl transition-all"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="hidden sm:inline">Logout</span>
+              </button>
+            </div>
           </div>
         </div>
       </header>

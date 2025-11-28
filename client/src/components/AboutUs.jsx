@@ -34,14 +34,14 @@ export default function AboutUs() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors duration-300">
       {/* Navbar */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
+      <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-100 dark:border-slate-700 sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
           <KekkonLogo />
           <Link 
             to="/"
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
+            className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Kembali
@@ -64,33 +64,33 @@ export default function AboutUs() {
             >
               <KekkonIcon size={80} id="about-hero" />
             </motion.div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-              Tentang <span className="text-amber-600">Kekkon</span>
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white mb-4">
+              Tentang <span className="text-amber-600 dark:text-amber-400">Kekkon</span>
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
               Platform undangan pernikahan digital gratis untuk membantu 
               calon mempelai di seluruh Indonesia.
             </p>
           </div>
 
           {/* Story */}
-          <div className="bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-gray-100 mb-12">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 md:p-12 shadow-sm border border-gray-100 dark:border-slate-700 mb-12">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center">
                 <Target className="w-6 h-6 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-800">Misi Kami</h2>
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Misi Kami</h2>
             </div>
-            <div className="space-y-4 text-gray-600 leading-relaxed">
+            <div className="space-y-4 text-gray-600 dark:text-gray-300 leading-relaxed">
               <p>
-                <strong className="text-gray-800">Kekkon</strong> (結婚 - yang berarti "pernikahan" dalam bahasa Jepang) 
+                <strong className="text-gray-800 dark:text-white">Kekkon</strong> (結婚 - yang berarti "pernikahan" dalam bahasa Jepang) 
                 lahir dari satu keyakinan sederhana: <em>setiap pasangan berhak mendapatkan undangan pernikahan 
                 yang indah dan modern, tanpa harus mengeluarkan biaya mahal.</em>
               </p>
               <p>
                 Kami memahami bahwa merencanakan pernikahan sudah cukup menguras waktu, tenaga, dan biaya. 
                 Oleh karena itu, kami ingin meringankan beban calon mempelai dengan menyediakan platform 
-                undangan digital yang <strong className="text-amber-600">100% gratis selamanya</strong>.
+                undangan digital yang <strong className="text-amber-600 dark:text-amber-400">100% gratis selamanya</strong>.
               </p>
               <p>
                 Dengan Kekkon, Anda bisa membuat undangan pernikahan digital yang cantik dalam hitungan menit, 
@@ -107,13 +107,13 @@ export default function AboutUs() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 * index }}
-                className="bg-white rounded-2xl p-6 text-center shadow-sm border border-gray-100"
+                className="bg-white dark:bg-slate-800 rounded-2xl p-6 text-center shadow-sm border border-gray-100 dark:border-slate-700"
               >
-                <div className="w-14 h-14 bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <value.icon className="w-7 h-7 text-amber-600" />
+                <div className="w-14 h-14 bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-500/20 dark:to-orange-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <value.icon className="w-7 h-7 text-amber-600 dark:text-amber-400" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-800 mb-2">{value.title}</h3>
-                <p className="text-gray-600 text-sm">{value.desc}</p>
+                <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-2">{value.title}</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">{value.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -145,34 +145,34 @@ export default function AboutUs() {
           </div>
 
           {/* How We Stay Free */}
-          <div className="bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-gray-100 mb-12">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 md:p-12 shadow-sm border border-gray-100 dark:border-slate-700 mb-12">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center">
                 <Zap className="w-6 h-6 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-800">Bagaimana Kekkon Tetap Gratis?</h2>
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Bagaimana Kekkon Tetap Gratis?</h2>
             </div>
-            <div className="space-y-4 text-gray-600 leading-relaxed">
+            <div className="space-y-4 text-gray-600 dark:text-gray-300 leading-relaxed">
               <p>
                 Anda mungkin bertanya-tanya: <em>"Bagaimana bisa layanan sebagus ini gratis?"</em>
               </p>
               <p>
-                Jawabannya sederhana: <strong className="text-gray-800">iklan</strong>. Kekkon didukung 
+                Jawabannya sederhana: <strong className="text-gray-800 dark:text-white">iklan</strong>. Kekkon didukung 
                 oleh iklan yang ditampilkan di platform kami melalui Google AdSense. Pendapatan dari 
                 iklan inilah yang membantu kami menutup biaya server, pengembangan, dan pemeliharaan 
                 platform.
               </p>
               <p>
-                Dengan model ini, kami bisa terus menyediakan layanan <strong className="text-amber-600">
+                Dengan model ini, kami bisa terus menyediakan layanan <strong className="text-amber-600 dark:text-amber-400">
                 100% gratis tanpa batasan</strong> - tanpa fitur premium berbayar, tanpa watermark, 
                 dan tanpa biaya tersembunyi. Setiap pasangan, dari latar belakang apapun, bisa 
                 mendapatkan undangan digital yang sama indahnya.
               </p>
-              <div className="mt-6 p-4 bg-amber-50 rounded-xl">
-                <p className="text-amber-800 text-sm">
+              <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-500/10 rounded-xl">
+                <p className="text-amber-800 dark:text-amber-300 text-sm">
                   <strong>Terima kasih</strong> telah menggunakan Kekkon! Dengan terus menggunakan 
                   layanan kami, Anda telah membantu mendukung misi kami untuk membuat undangan 
-                  pernikahan digital yang indah dapat diakses oleh semua orang. 💛
+                  pernikahan digital yang indah dapat diakses oleh semua orang.
                 </p>
               </div>
             </div>
@@ -180,15 +180,15 @@ export default function AboutUs() {
 
           {/* CTA */}
           <div className="text-center">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4">
+            <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
               Siap Membuat Undangan?
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
               Bergabung dengan ribuan pasangan yang telah menggunakan Kekkon
             </p>
             <Link
               to="/register"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-2xl hover:shadow-lg hover:shadow-amber-200 transition-all"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-2xl hover:shadow-lg hover:shadow-amber-200 dark:hover:shadow-amber-500/20 transition-all"
             >
               Mulai Gratis Sekarang
               <Heart className="w-5 h-5" />
@@ -198,15 +198,15 @@ export default function AboutUs() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-100 py-8 mt-12">
+      <footer className="bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-700 py-8 mt-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <KekkonLogo />
             <div className="flex gap-6 text-sm">
-              <Link to="/about" className="text-gray-600 hover:text-amber-600">Tentang</Link>
-              <Link to="/privacy" className="text-gray-600 hover:text-amber-600">Privasi</Link>
+              <Link to="/about" className="text-gray-600 dark:text-gray-400 hover:text-amber-600 dark:hover:text-amber-400">Tentang</Link>
+              <Link to="/privacy" className="text-gray-600 dark:text-gray-400 hover:text-amber-600 dark:hover:text-amber-400">Privasi</Link>
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               &copy; {new Date().getFullYear()} Kekkon. All rights reserved.
             </p>
           </div>

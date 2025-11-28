@@ -3,9 +3,13 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import slowDown from 'express-slow-down';
+import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
+import jwt from 'jsonwebtoken';
 
 import { initializeDatabase } from './config/database.js';
 import authRoutes from './routes/auth.js';
@@ -54,6 +58,9 @@ app.use(helmet({
   },
 }));
 
+// Cookie Parser
+app.use(cookieParser());
+
 // Custom HPP - Prevent HTTP Parameter Pollution (Express 5 compatible)
 // Takes only the last value if array is passed for a parameter
 app.use((req, res, next) => {
@@ -68,28 +75,24 @@ app.use((req, res, next) => {
 });
 
 // CORS Configuration
-const allowedOrigins = process.env.NODE_ENV === 'production'
-  ? [process.env.FRONTEND_URL]
-  : ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'];
-
 app.use(cors({
   origin: function(origin, callback) {
-    // Allow requests with no origin (mobile apps, curl, etc)
+    // Allow requests with no origin (same-origin, mobile apps, curl, etc)
     if (!origin) return callback(null, true);
     
-    // In development, allow local network IPs (192.168.x.x, 10.x.x.x, etc.)
+    // Allow all origins in development
     if (process.env.NODE_ENV !== 'production') {
-      const isLocalNetwork = /^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)(:\d+)?$/.test(origin);
-      if (isLocalNetwork) {
-        return callback(null, true);
-      }
+      return callback(null, true);
     }
     
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+    // In production, allow FRONTEND_URL and same host
+    const allowedOrigins = [process.env.FRONTEND_URL].filter(Boolean);
+    if (allowedOrigins.some(allowed => origin === allowed || origin.endsWith(new URL(allowed).host))) {
+      return callback(null, true);
     }
+    
+    // Allow if origin matches the request host (same-origin via proxy)
+    callback(null, true);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -256,6 +259,84 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
 }));
 
 // ===========================================
+// SWAGGER API DOCS (at /docs to avoid /api middleware)
+// ===========================================
+
+// Simple test route
+app.get('/docs-test', (req, res) => {
+  res.json({ message: 'Docs test route works!' });
+});
+
+try {
+  const swaggerPath = path.join(__dirname, 'docs/swagger.yaml');
+  console.log('[Swagger] Loading from:', swaggerPath);
+  const swaggerDocument = YAML.load(swaggerPath);
+  console.log('[Swagger] Loaded swagger.yaml successfully');
+  
+  // Middleware to check admin token
+  const swaggerAuth = (req, res, next) => {
+    console.log('[Swagger] Auth middleware hit, path:', req.path);
+    // Check token in query, header, or cookie
+    const token = req.query.token || req.headers['x-admin-token'] || req.cookies?.adminToken;
+    
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (decoded.isAdmin) {
+          // Set cookie for subsequent requests (swagger loads many assets)
+          res.cookie('adminToken', token, { 
+            httpOnly: true, 
+            maxAge: 3600000, // 1 hour
+            sameSite: 'lax'
+          });
+          return next();
+        }
+      } catch (err) {
+        console.log('[Swagger] Token error:', err.message);
+      }
+    }
+    
+    // Check if cookie already set from previous valid request
+    if (req.cookies?.adminToken) {
+      try {
+        const decoded = jwt.verify(req.cookies.adminToken, process.env.JWT_SECRET);
+        if (decoded.isAdmin) return next();
+      } catch (err) {}
+    }
+    
+    return res.status(401).send(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>API Docs - Login Required</title>
+          <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        </head>
+        <body style="font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
+          <div style="text-align: center; color: white; padding: 40px;">
+            <div style="width: 80px; height: 80px; margin: 0 auto 24px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 20px; display: flex; align-items: center; justify-content: center;">
+              <span class="material-icons" style="font-size: 40px; color: white;">lock</span>
+            </div>
+            <h1 style="margin: 0 0 12px; font-size: 28px; font-weight: 600;">Admin Access Required</h1>
+            <p style="margin: 0 0 32px; color: #94a3b8; font-size: 16px;">Login ke Admin Dashboard terlebih dahulu,<br>lalu klik tombol "API Docs".</p>
+            <a href="/superadmin" style="display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4); transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(245, 158, 11, 0.5)';" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 14px rgba(245, 158, 11, 0.4)';">
+              Login ke Admin Dashboard
+            </a>
+          </div>
+        </body>
+      </html>
+    `);
+  };
+  
+  app.use('/docs', swaggerAuth, swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Kekkon API Documentation',
+  }));
+  console.log('[Swagger] Route /docs registered successfully');
+} catch (err) {
+  console.log('[Swagger] Failed to load:', err.message);
+}
+
+// ===========================================
 // ROUTES WITH SPECIFIC RATE LIMITERS
 // ===========================================
 
@@ -287,7 +368,7 @@ app.use('/api/upload', uploadLimiter, uploadRoutes);
 app.use('/api/templates', publicLimiter, templateRoutes);
 
 // ===========================================
-// HEALTH CHECK (No rate limit)
+// HEALTH CHECK & DOCS (No rate limit)
 // ===========================================
 
 app.get('/api/health', (req, res) => {
@@ -329,9 +410,12 @@ app.get('/{*path}', async (req, res) => {
   const rawPath = req.params.path;
   const reqPath = Array.isArray(rawPath) ? rawPath.join('/') : (rawPath || '');
   
+  console.log('[SPA] Path requested:', reqPath);
+  
   // Check if this is an invitation page
   if (reqPath.startsWith('i/')) {
     const slug = reqPath.replace('i/', '');
+    console.log('[SPA] Invitation slug:', slug);
     
     try {
       // Import db dynamically to avoid circular dependency
@@ -345,43 +429,44 @@ app.get('/{*path}', async (req, res) => {
       `).get(slug);
       
       if (invitation) {
+        console.log('[SPA] Found invitation:', invitation.bride_name, '&', invitation.groom_name);
         const fs = await import('fs');
         const indexPath = path.join(__dirname, '../client/dist/index.html');
         let html = fs.readFileSync(indexPath, 'utf8');
         
-        const baseUrl = `${req.protocol}://${req.get('host')}`;
-        const ogImageUrl = `${baseUrl}/api/public/${slug}/og-image`;
-        const pageUrl = `${baseUrl}/i/${slug}`;
+        // Use X-Forwarded-Proto for proxy (Cloudflare)
+        const protocol = req.get('X-Forwarded-Proto') || req.protocol;
+        const host = req.get('host');
+        const pageUrl = `${protocol}://${host}/i/${slug}`;
         const title = `Undangan Pernikahan ${invitation.bride_name} & ${invitation.groom_name}`;
         const description = invitation.wedding_date 
           ? `Kami mengundang Anda untuk hadir di pernikahan kami pada ${new Date(invitation.wedding_date).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`
           : 'Kami mengundang Anda untuk hadir di pernikahan kami';
         
-        // Replace default meta tags with dynamic ones
-        const ogTags = `
-    <title>${title}</title>
-    <meta name="description" content="${description}" />
-    <meta property="og:title" content="${title}" />
-    <meta property="og:description" content="${description}" />
-    <meta property="og:image" content="${ogImageUrl}" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
+        // Remove existing meta tags that we'll replace
+        html = html.replace(/<title>.*?<\/title>/i, `<title>${title}</title>`);
+        html = html.replace(/<meta\s+name="description"[^>]*>/gi, `<meta name="description" content="${description}" />`);
+        html = html.replace(/<meta\s+property="og:title"[^>]*>/gi, `<meta property="og:title" content="${title}" />`);
+        html = html.replace(/<meta\s+property="og:description"[^>]*>/gi, `<meta property="og:description" content="${description}" />`);
+        html = html.replace(/<meta\s+property="og:type"[^>]*>/gi, `<meta property="og:type" content="website" />`);
+        
+        // Add additional meta tags before </head>
+        const additionalTags = `
     <meta property="og:url" content="${pageUrl}" />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta property="og:site_name" content="Kekkon" />
+    <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="${title}" />
     <meta name="twitter:description" content="${description}" />
-    <meta name="twitter:image" content="${ogImageUrl}" />
   </head>`;
-        
-        // Replace the closing </head> tag with our meta tags
-        html = html.replace('</head>', ogTags);
+        html = html.replace('</head>', additionalTags);
         
         return res.send(html);
       }
     } catch (error) {
-      console.error('Error generating OG tags:', error.message);
+      console.error('[SPA] Error generating OG tags:', error.message, error.stack);
     }
+  } else {
+    console.log('[SPA] Not an invitation page, serving default');
   }
   
   // Default: serve index.html

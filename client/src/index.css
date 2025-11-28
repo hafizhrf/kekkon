@@ -2,6 +2,8 @@
 
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-blush-50: #FDE2E4;
   --color-blush-100: #FAD2E1;
