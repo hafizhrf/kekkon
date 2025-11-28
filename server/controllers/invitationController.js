@@ -1,5 +1,12 @@
 import db from '../config/database.js';
 import { v4 as uuidv4 } from 'uuid';
+import sharp from 'sharp';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 function generateSlug(brideName, groomName) {
   const names = `${brideName}-${groomName}`.toLowerCase()
@@ -457,5 +464,163 @@ export function getAnalytics(req, res) {
   } catch (error) {
     console.error('Get analytics error:', error);
     res.status(500).json({ error: 'Failed to get analytics' });
+  }
+}
+
+// Generate OG Image for social sharing
+export async function getOGImage(req, res) {
+  try {
+    const { slug } = req.params;
+    
+    const invitation = db.prepare(`
+      SELECT ic.bride_name, ic.groom_name, ic.bride_photo, ic.groom_photo, 
+             ic.wedding_date, ic.primary_color, ic.secondary_color
+      FROM invitations i
+      LEFT JOIN invitation_content ic ON i.id = ic.invitation_id
+      WHERE i.slug = ?
+    `).get(slug);
+
+    if (!invitation) {
+      return res.status(404).json({ error: 'Invitation not found' });
+    }
+
+    const width = 1200;
+    const height = 630; // 1.91:1 ratio (standard OG image)
+    
+    const primaryColor = invitation.primary_color || '#D4A373';
+    const secondaryColor = invitation.secondary_color || '#FEFAE0';
+    
+    // Convert hex to RGB
+    const hexToRgb = (hex) => {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+      } : { r: 212, g: 163, b: 115 };
+    };
+    
+    const primary = hexToRgb(primaryColor);
+    const secondary = hexToRgb(secondaryColor);
+
+    // Create base image with gradient background
+    const svgBackground = `
+      <svg width="${width}" height="${height}">
+        <defs>
+          <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:rgb(${secondary.r},${secondary.g},${secondary.b});stop-opacity:1" />
+            <stop offset="100%" style="stop-color:rgb(${Math.max(0, secondary.r - 20)},${Math.max(0, secondary.g - 20)},${Math.max(0, secondary.b - 10)});stop-opacity:1" />
+          </linearGradient>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#bg)"/>
+        
+        <!-- Decorative circles -->
+        <circle cx="100" cy="100" r="150" fill="rgb(${primary.r},${primary.g},${primary.b})" opacity="0.1"/>
+        <circle cx="1100" cy="530" r="200" fill="rgb(${primary.r},${primary.g},${primary.b})" opacity="0.1"/>
+        
+        <!-- Center heart icon -->
+        <g transform="translate(600, 315)">
+          <path d="M0,-15 C-15,-35 -45,-20 -45,5 C-45,35 0,55 0,55 C0,55 45,35 45,5 C45,-20 15,-35 0,-15" 
+                fill="rgb(${primary.r},${primary.g},${primary.b})" opacity="0.3" transform="scale(1.5)"/>
+        </g>
+        
+        <!-- Text: The Wedding of -->
+        <text x="600" y="180" font-family="Georgia, serif" font-size="28" fill="rgb(${primary.r},${primary.g},${primary.b})" text-anchor="middle" opacity="0.8">The Wedding of</text>
+        
+        <!-- Names -->
+        <text x="600" y="340" font-family="Georgia, serif" font-size="72" fill="rgb(${Math.max(0, primary.r - 40)},${Math.max(0, primary.g - 40)},${Math.max(0, primary.b - 40)})" text-anchor="middle" font-weight="600">${invitation.bride_name || 'Bride'}</text>
+        <text x="600" y="400" font-family="Georgia, serif" font-size="36" fill="rgb(${primary.r},${primary.g},${primary.b})" text-anchor="middle">&amp;</text>
+        <text x="600" y="470" font-family="Georgia, serif" font-size="72" fill="rgb(${Math.max(0, primary.r - 40)},${Math.max(0, primary.g - 40)},${Math.max(0, primary.b - 40)})" text-anchor="middle" font-weight="600">${invitation.groom_name || 'Groom'}</text>
+        
+        <!-- Date -->
+        <text x="600" y="550" font-family="Arial, sans-serif" font-size="24" fill="rgb(${primary.r},${primary.g},${primary.b})" text-anchor="middle" opacity="0.7">${invitation.wedding_date ? new Date(invitation.wedding_date).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : ''}</text>
+        
+        <!-- Kekkon branding -->
+        <text x="600" y="610" font-family="Arial, sans-serif" font-size="16" fill="rgb(${primary.r},${primary.g},${primary.b})" text-anchor="middle" opacity="0.5">kekkon.hafizhrf.me</text>
+      </svg>
+    `;
+
+    let finalImage = sharp(Buffer.from(svgBackground));
+    const composites = [];
+
+    // Try to add bride photo
+    if (invitation.bride_photo) {
+      try {
+        const bridePath = path.join(__dirname, '..', invitation.bride_photo);
+        if (fs.existsSync(bridePath)) {
+          const bridePhoto = await sharp(bridePath)
+            .resize(180, 180, { fit: 'cover' })
+            .composite([{
+              input: Buffer.from(`<svg><circle cx="90" cy="90" r="90" fill="white"/></svg>`),
+              blend: 'dest-in'
+            }])
+            .png()
+            .toBuffer();
+          
+          composites.push({
+            input: bridePhoto,
+            left: 180,
+            top: 225
+          });
+          
+          // Add border circle
+          composites.push({
+            input: Buffer.from(`<svg width="190" height="190"><circle cx="95" cy="95" r="93" fill="none" stroke="rgb(${primary.r},${primary.g},${primary.b})" stroke-width="4"/></svg>`),
+            left: 175,
+            top: 220
+          });
+        }
+      } catch (e) {
+        console.error('Error processing bride photo:', e.message);
+      }
+    }
+
+    // Try to add groom photo
+    if (invitation.groom_photo) {
+      try {
+        const groomPath = path.join(__dirname, '..', invitation.groom_photo);
+        if (fs.existsSync(groomPath)) {
+          const groomPhoto = await sharp(groomPath)
+            .resize(180, 180, { fit: 'cover' })
+            .composite([{
+              input: Buffer.from(`<svg><circle cx="90" cy="90" r="90" fill="white"/></svg>`),
+              blend: 'dest-in'
+            }])
+            .png()
+            .toBuffer();
+          
+          composites.push({
+            input: groomPhoto,
+            left: 830,
+            top: 225
+          });
+          
+          // Add border circle
+          composites.push({
+            input: Buffer.from(`<svg width="190" height="190"><circle cx="95" cy="95" r="93" fill="none" stroke="rgb(${primary.r},${primary.g},${primary.b})" stroke-width="4"/></svg>`),
+            left: 825,
+            top: 220
+          });
+        }
+      } catch (e) {
+        console.error('Error processing groom photo:', e.message);
+      }
+    }
+
+    if (composites.length > 0) {
+      finalImage = finalImage.composite(composites);
+    }
+
+    const buffer = await finalImage.png().toBuffer();
+
+    res.set({
+      'Content-Type': 'image/png',
+      'Cache-Control': 'public, max-age=86400', // Cache for 1 day
+    });
+    res.send(buffer);
+    
+  } catch (error) {
+    console.error('Generate OG image error:', error);
+    res.status(500).json({ error: 'Failed to generate image' });
   }
 }

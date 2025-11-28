@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "db:refresh": "node scripts/refresh-db.js --force",
+    "cleanup": "node scripts/cleanup-expired.js"
   },
   "keywords": [
     "wedding",

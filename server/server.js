@@ -14,6 +14,7 @@ import guestRoutes from './routes/guests.js';
 import publicRoutes from './routes/public.js';
 import uploadRoutes from './routes/upload.js';
 import templateRoutes from './routes/templates.js';
+import adminRoutes from './routes/admin.js';
 
 dotenv.config();
 
@@ -22,6 +23,10 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Trust proxy for Cloudflare Tunnel / Nginx reverse proxy
+// This is needed for rate limiting to work correctly behind a proxy
+app.set('trust proxy', 1);
 
 initializeDatabase();
 
@@ -36,11 +41,15 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      styleSrcElem: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://static.cloudflareinsights.com", "https://pagead2.googlesyndication.com", "https://www.googletagservices.com"],
+      scriptSrcElem: ["'self'", "'unsafe-inline'", "https://static.cloudflareinsights.com", "https://pagead2.googlesyndication.com", "https://www.googletagservices.com", "https://adservice.google.com"],
       imgSrc: ["'self'", "data:", "blob:", "*"],
       mediaSrc: ["'self'", "data:", "blob:", "*"],
-      fontSrc: ["'self'", "data:"],
+      fontSrc: ["'self'", "data:", "https://fonts.gstatic.com"],
+      connectSrc: ["'self'", "https://cloudflareinsights.com", "https://pagead2.googlesyndication.com", "https://*.google.com"],
+      frameSrc: ["'self'", "https://www.google.com", "https://maps.google.com", "https://*.google.com", "https://googleads.g.doubleclick.net", "https://tpc.googlesyndication.com"],
     },
   },
 }));
@@ -67,6 +76,15 @@ app.use(cors({
   origin: function(origin, callback) {
     // Allow requests with no origin (mobile apps, curl, etc)
     if (!origin) return callback(null, true);
+    
+    // In development, allow local network IPs (192.168.x.x, 10.x.x.x, etc.)
+    if (process.env.NODE_ENV !== 'production') {
+      const isLocalNetwork = /^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)(:\d+)?$/.test(origin);
+      if (isLocalNetwork) {
+        return callback(null, true);
+      }
+    }
+    
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -82,60 +100,67 @@ app.use(cors({
 // RATE LIMITING & DDoS PROTECTION
 // ===========================================
 
-// General API rate limiter - 100 requests per 15 minutes
+const isDev = process.env.NODE_ENV !== 'production';
+
+// Skip rate limiting in development for easier testing
+const skipInDev = () => isDev;
+
+// General API rate limiter - More lenient
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
+  max: isDev ? 1000 : 200, // Higher in dev, 200 in production
   message: { error: 'Terlalu banyak request, coba lagi dalam 15 menit.' },
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => req.path === '/api/health',
 });
 
-// Strict limiter for auth routes - Prevent brute force attacks
+// Auth limiter - Per IP, resets on successful login
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // Only 10 attempts per 15 minutes
+  max: isDev ? 100 : 20, // 20 attempts per 15 min per IP in production
   message: { error: 'Terlalu banyak percobaan login. Coba lagi dalam 15 menit.' },
   standardHeaders: true,
   legacyHeaders: false,
-  skipSuccessfulRequests: false,
+  skipSuccessfulRequests: true, // Reset on successful login
 });
 
-// Very strict limiter for registration - Prevent spam accounts
+// Registration limiter
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 5, // Only 5 registrations per hour per IP
+  max: isDev ? 100 : 10, // 10 registrations per hour per IP
   message: { error: 'Terlalu banyak pendaftaran. Coba lagi dalam 1 jam.' },
+  skip: skipInDev,
 });
 
-// Limiter for public routes (viewing invitations) - More lenient
+// Public routes limiter - Very lenient for guests viewing invitations
 const publicLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
-  max: 60, // 60 requests per minute
+  max: isDev ? 500 : 120, // 120 requests per minute per IP
   message: { error: 'Terlalu banyak request, coba lagi nanti.' },
 });
 
-// RSVP submission limiter - Prevent spam
+// RSVP limiter
 const rsvpLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 10, // 10 RSVPs per hour per IP
+  max: isDev ? 100 : 20, // 20 RSVPs per hour per IP
   message: { error: 'Terlalu banyak pengiriman RSVP. Coba lagi nanti.' },
 });
 
-// Upload limiter - Prevent storage abuse
+// Upload limiter
 const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 50, // 50 uploads per hour
+  max: isDev ? 200 : 100, // 100 uploads per hour
   message: { error: 'Terlalu banyak upload. Coba lagi dalam 1 jam.' },
 });
 
-// Speed limiter - Gradually slow down responses under heavy load
+// Speed limiter - Only in production
 const speedLimiter = slowDown({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  delayAfter: 50, // Start slowing after 50 requests
-  delayMs: (hits) => hits * 100, // Add 100ms delay per request above limit
-  maxDelayMs: 5000, // Max 5 second delay
+  delayAfter: isDev ? 1000 : 100, // Start slowing after 100 requests in prod
+  delayMs: (hits) => isDev ? 0 : hits * 50, // 50ms delay per request in prod
+  maxDelayMs: 2000, // Max 2 second delay
+  skip: skipInDev,
 });
 
 // ===========================================
@@ -242,15 +267,18 @@ app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', registerLimiter);
 app.use('/api/auth', generalLimiter, authRoutes);
 
-// Protected routes
-app.use('/api/invitations', generalLimiter, invitationRoutes);
-app.use('/api', generalLimiter, guestRoutes);
+// Admin routes - must be before guestRoutes which uses authenticateToken globally
+app.use('/api/admin', authLimiter, adminRoutes);
 
-// Public routes with more lenient limiting
+// Public routes - must be before guestRoutes which uses authenticateToken globally
 app.use('/api/public', publicLimiter, publicRoutes);
 
 // RSVP has its own limiter (handled in public routes)
 app.use('/api/public/rsvp', rsvpLimiter);
+
+// Protected routes
+app.use('/api/invitations', generalLimiter, invitationRoutes);
+app.use('/api', generalLimiter, guestRoutes);
 
 // Upload routes with specific limiter
 app.use('/api/upload', uploadLimiter, uploadRoutes);
@@ -270,6 +298,22 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Serve client dist folder
+app.use(express.static(path.join(__dirname, '../client/dist'), {
+  maxAge: '1d',
+  etag: true,
+  setHeaders: (res, filePath) => {
+    // Set correct MIME types
+    if (filePath.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    } else if (filePath.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css');
+    } else if (filePath.endsWith('.html')) {
+      res.setHeader('Content-Type', 'text/html');
+    }
+  }
+}));
+
 // ===========================================
 // ERROR HANDLING
 // ===========================================
@@ -277,6 +321,71 @@ app.get('/api/health', (req, res) => {
 // 404 Handler for API routes
 app.use('/api', (req, res, next) => {
   res.status(404).json({ error: 'Endpoint tidak ditemukan' });
+});
+
+// SPA catch-all - serve index.html with dynamic OG tags for invitation pages
+app.get('/{*path}', async (req, res) => {
+  // In Express 5, wildcard params can be array or string
+  const rawPath = req.params.path;
+  const reqPath = Array.isArray(rawPath) ? rawPath.join('/') : (rawPath || '');
+  
+  // Check if this is an invitation page
+  if (reqPath.startsWith('i/')) {
+    const slug = reqPath.replace('i/', '');
+    
+    try {
+      // Import db dynamically to avoid circular dependency
+      const { default: db } = await import('./config/database.js');
+      
+      const invitation = db.prepare(`
+        SELECT ic.bride_name, ic.groom_name, ic.wedding_date, ic.primary_color
+        FROM invitations i
+        LEFT JOIN invitation_content ic ON i.id = ic.invitation_id
+        WHERE i.slug = ?
+      `).get(slug);
+      
+      if (invitation) {
+        const fs = await import('fs');
+        const indexPath = path.join(__dirname, '../client/dist/index.html');
+        let html = fs.readFileSync(indexPath, 'utf8');
+        
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        const ogImageUrl = `${baseUrl}/api/public/${slug}/og-image`;
+        const pageUrl = `${baseUrl}/i/${slug}`;
+        const title = `Undangan Pernikahan ${invitation.bride_name} & ${invitation.groom_name}`;
+        const description = invitation.wedding_date 
+          ? `Kami mengundang Anda untuk hadir di pernikahan kami pada ${new Date(invitation.wedding_date).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`
+          : 'Kami mengundang Anda untuk hadir di pernikahan kami';
+        
+        // Replace default meta tags with dynamic ones
+        const ogTags = `
+    <title>${title}</title>
+    <meta name="description" content="${description}" />
+    <meta property="og:title" content="${title}" />
+    <meta property="og:description" content="${description}" />
+    <meta property="og:image" content="${ogImageUrl}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:url" content="${pageUrl}" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="${title}" />
+    <meta name="twitter:description" content="${description}" />
+    <meta name="twitter:image" content="${ogImageUrl}" />
+  </head>`;
+        
+        // Replace the closing </head> tag with our meta tags
+        html = html.replace('</head>', ogTags);
+        
+        return res.send(html);
+      }
+    } catch (error) {
+      console.error('Error generating OG tags:', error.message);
+    }
+  }
+  
+  // Default: serve index.html
+  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 
 // Global error handler

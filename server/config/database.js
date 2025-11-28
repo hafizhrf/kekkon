@@ -13,6 +13,32 @@ db.pragma('journal_mode = WAL');
 db.pragma('synchronous = NORMAL');
 db.pragma('cache_size = 10000');
 db.pragma('temp_store = MEMORY');
+db.pragma('wal_autocheckpoint = 1000');
+
+// Periodic WAL checkpoint to prevent lag
+let checkpointInterval;
+const startCheckpointInterval = () => {
+  if (checkpointInterval) clearInterval(checkpointInterval);
+  checkpointInterval = setInterval(() => {
+    try {
+      db.pragma('wal_checkpoint(TRUNCATE)');
+    } catch (err) {
+      console.error('WAL checkpoint error:', err.message);
+    }
+  }, 5 * 60 * 1000); // Every 5 minutes
+};
+startCheckpointInterval();
+
+// Cleanup on process exit
+process.on('exit', () => {
+  if (checkpointInterval) clearInterval(checkpointInterval);
+  try {
+    db.pragma('wal_checkpoint(TRUNCATE)');
+    db.close();
+  } catch (err) {}
+});
+process.on('SIGINT', () => process.exit());
+process.on('SIGTERM', () => process.exit());
 
 export function initializeDatabase() {
   db.exec(`
@@ -38,6 +64,7 @@ export function initializeDatabase() {
       enable_countdown INTEGER DEFAULT 1,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      expires_at DATETIME DEFAULT (datetime('now', '+3 months')),
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );
 
@@ -115,6 +142,19 @@ export function initializeDatabase() {
     CREATE INDEX IF NOT EXISTS idx_guests_name ON guests(invitation_id, name);
     CREATE INDEX IF NOT EXISTS idx_page_views_invitation_id ON page_views(invitation_id);
   `);
+
+  // Migration: Add expires_at column if not exists
+  try {
+    const tableInfo = db.prepare("PRAGMA table_info(invitations)").all();
+    const hasExpiresAt = tableInfo.some(col => col.name === 'expires_at');
+    if (!hasExpiresAt) {
+      db.exec("ALTER TABLE invitations ADD COLUMN expires_at DATETIME DEFAULT (datetime('now', '+3 months'))");
+      db.exec("UPDATE invitations SET expires_at = datetime(created_at, '+3 months') WHERE expires_at IS NULL");
+      console.log('Migration: Added expires_at column to invitations');
+    }
+  } catch (err) {
+    console.log('Migration check for expires_at:', err.message);
+  }
 
   const templatesExist = db.prepare('SELECT COUNT(*) as count FROM templates').get();
   if (templatesExist.count === 0) {
