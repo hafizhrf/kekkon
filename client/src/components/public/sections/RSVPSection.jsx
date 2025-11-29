@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { publicAPI } from '../../../utils/api';
 import { Send, Check, MessageSquare, User, Users, Heart, X, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { FloralDivider, GoldAccent, FloralCorner } from '../decorations/Ornaments';
-import { getThemeDecorations } from '../decorations/ThemedDecorations';
 
 export default function RSVPSection({ invitation, guestName, slug }) {
   const [name, setName] = useState(guestName || '');
@@ -20,6 +18,29 @@ export default function RSVPSection({ invitation, guestName, slug }) {
 
   const primaryColor = invitation.primary_color || '#D4A373';
   const secondaryColor = invitation.secondary_color || '#FEFAE0';
+  const templateId = invitation.template_id || 'geometric-modern';
+  
+  // Get border radius based on template
+  const getCardRadius = () => {
+    switch (templateId) {
+      case 'geometric-modern':
+        return 'rounded-none'; // Sharp corners for geometric modern
+      case 'minimalist-elegant':
+        return 'rounded-xl';
+      case 'colorful-playful':
+        return 'rounded-3xl';
+      case 'floral-romantic':
+        return 'rounded-2xl';
+      case 'rustic-vintage':
+        return 'rounded-lg';
+      case 'islamic-traditional':
+        return 'rounded-xl';
+      default:
+        return 'rounded-3xl';
+    }
+  };
+  
+  const cardRadius = getCardRadius();
 
   useEffect(() => {
     loadMessages();
@@ -135,7 +156,7 @@ export default function RSVPSection({ invitation, guestName, slug }) {
           >
             {submitted ? (
               <div 
-                className="bg-white rounded-3xl p-8 md:p-10 text-center shadow-xl"
+                className={`bg-white ${cardRadius} p-8 md:p-10 text-center shadow-xl`}
                 style={{ boxShadow: `0 20px 60px ${primaryColor}15` }}
               >
                 <motion.div
@@ -162,7 +183,7 @@ export default function RSVPSection({ invitation, guestName, slug }) {
             ) : (
               <form 
                 onSubmit={handleSubmit} 
-                className="bg-white rounded-3xl p-6 md:p-8 shadow-xl space-y-6"
+                className={`bg-white ${cardRadius} p-6 md:p-8 shadow-xl space-y-6`}
                 style={{ boxShadow: `0 20px 60px ${primaryColor}15` }}
               >
                 {/* Name Input */}
@@ -308,7 +329,7 @@ export default function RSVPSection({ invitation, guestName, slug }) {
             viewport={{ once: true }}
           >
             <div 
-              className="bg-white rounded-3xl p-6 md:p-8 shadow-xl h-full max-h-[600px] overflow-hidden flex flex-col"
+              className={`bg-white ${cardRadius} p-6 md:p-8 shadow-xl h-full max-h-[600px] overflow-hidden flex flex-col`}
               style={{ boxShadow: `0 20px 60px ${primaryColor}15` }}
             >
               <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
@@ -345,7 +366,7 @@ export default function RSVPSection({ invitation, guestName, slug }) {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      className="p-4 rounded-2xl"
+                      className={`p-4 ${templateId === 'geometric-modern' ? 'rounded-none' : 'rounded-2xl'}`}
                       style={{ backgroundColor: `${primaryColor}08` }}
                     >
                       <div className="flex items-center gap-3 mb-2">

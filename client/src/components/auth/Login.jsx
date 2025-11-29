@@ -30,20 +30,20 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-white to-orange-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 px-4 relative overflow-hidden transition-colors duration-300">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-white to-orange-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 px-0 md:px-4 relative overflow-hidden transition-colors duration-300">
       {/* Theme Toggle */}
       <div className="absolute top-4 right-4 z-20">
         <ThemeToggle />
       </div>
 
-      {/* Background decorations */}
-      <div className="absolute top-20 left-10 w-72 h-72 bg-amber-200/30 dark:bg-amber-500/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-20 right-10 w-96 h-96 bg-orange-200/30 dark:bg-orange-500/10 rounded-full blur-3xl" />
+      {/* Background decorations - hidden on mobile */}
+      <div className="hidden md:block absolute top-20 left-10 w-72 h-72 bg-amber-200/30 dark:bg-amber-500/10 rounded-full blur-3xl" />
+      <div className="hidden md:block absolute bottom-20 right-10 w-96 h-96 bg-orange-200/30 dark:bg-orange-500/10 rounded-full blur-3xl" />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full bg-white dark:bg-slate-800 rounded-3xl shadow-xl shadow-amber-100/50 dark:shadow-amber-500/5 p-8 relative z-10"
+        className="max-w-md w-full md:bg-white md:dark:bg-slate-800 md:rounded-3xl md:shadow-xl md:shadow-amber-100/50 md:dark:shadow-amber-500/5 p-6 md:p-8 relative z-10"
       >
         <div className="text-center mb-8">
           <Link to="/" className="inline-block mb-4">

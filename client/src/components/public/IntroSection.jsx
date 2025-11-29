@@ -197,8 +197,12 @@ function ModernIntro({ invitation, guestName, onOpen }) {
 }
 
 // Minimalist Elegant - Ultra clean with dramatic whitespace and thin lines
+// Uses monochrome palette with serif typography
 function MinimalistIntro({ invitation, guestName, onOpen }) {
-  const primaryColor = invitation.primary_color || '#D4A373';
+  // Monochrome colors for minimalist elegant
+  const textColor = '#1f2937'; // dark gray
+  const accentColor = '#d1d5db'; // light gray
+  const borderColor = '#e5e7eb'; // subtle gray
 
   return (
     <div className="min-h-screen flex items-center justify-center relative bg-white overflow-hidden">
@@ -208,28 +212,28 @@ function MinimalistIntro({ invitation, guestName, onOpen }) {
         animate={{ scaleY: 1 }}
         transition={{ delay: 0.3, duration: 1.2, ease: "easeOut" }}
         className="absolute left-8 md:left-16 top-0 bottom-0 w-px origin-top"
-        style={{ backgroundColor: `${primaryColor}20` }}
+        style={{ backgroundColor: borderColor }}
       />
       <motion.div
         initial={{ scaleY: 0 }}
         animate={{ scaleY: 1 }}
         transition={{ delay: 0.4, duration: 1.2, ease: "easeOut" }}
         className="absolute right-8 md:right-16 top-0 bottom-0 w-px origin-bottom"
-        style={{ backgroundColor: `${primaryColor}20` }}
+        style={{ backgroundColor: borderColor }}
       />
       <motion.div
         initial={{ scaleX: 0 }}
         animate={{ scaleX: 1 }}
         transition={{ delay: 0.5, duration: 1.2, ease: "easeOut" }}
         className="absolute top-8 md:top-16 left-0 right-0 h-px origin-left"
-        style={{ backgroundColor: `${primaryColor}15` }}
+        style={{ backgroundColor: borderColor }}
       />
       <motion.div
         initial={{ scaleX: 0 }}
         animate={{ scaleX: 1 }}
         transition={{ delay: 0.6, duration: 1.2, ease: "easeOut" }}
         className="absolute bottom-8 md:bottom-16 left-0 right-0 h-px origin-right"
-        style={{ backgroundColor: `${primaryColor}15` }}
+        style={{ backgroundColor: borderColor }}
       />
 
       {/* Subtle corner dots */}
@@ -245,7 +249,7 @@ function MinimalistIntro({ invitation, guestName, onOpen }) {
           animate={{ scale: 1 }}
           transition={{ delay: 0.8 + i * 0.1, duration: 0.3 }}
           className="absolute w-1.5 h-1.5 rounded-full"
-          style={{ ...pos, backgroundColor: primaryColor, opacity: 0.3 }}
+          style={{ ...pos, backgroundColor: '#374151', opacity: 0.3 }}
         />
       ))}
 
@@ -268,15 +272,15 @@ function MinimalistIntro({ invitation, guestName, onOpen }) {
               animate={{ width: 40 }}
               transition={{ delay: 0.9, duration: 0.6 }}
               className="h-px"
-              style={{ backgroundColor: primaryColor, opacity: 0.4 }}
+              style={{ backgroundColor: accentColor }}
             />
-            <div className="w-2 h-2 rotate-45 border" style={{ borderColor: primaryColor, opacity: 0.5 }} />
+            <div className="w-2 h-2 rotate-45 border" style={{ borderColor: accentColor }} />
             <motion.div 
               initial={{ width: 0 }}
               animate={{ width: 40 }}
               transition={{ delay: 0.9, duration: 0.6 }}
               className="h-px"
-              style={{ backgroundColor: primaryColor, opacity: 0.4 }}
+              style={{ backgroundColor: accentColor }}
             />
           </div>
         </motion.div>
@@ -285,7 +289,7 @@ function MinimalistIntro({ invitation, guestName, onOpen }) {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
-          className="text-gray-400 tracking-[0.4em] uppercase text-[10px] mb-8"
+          className="text-gray-400 tracking-[0.4em] uppercase text-[10px] mb-8 font-serif"
         >
           The Wedding of
         </motion.p>
@@ -295,17 +299,17 @@ function MinimalistIntro({ invitation, guestName, onOpen }) {
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
         >
-          <h1 className="text-4xl md:text-6xl font-playfair font-light tracking-wider mb-4" style={{ color: primaryColor }}>
+          <h1 className="text-4xl md:text-6xl font-playfair font-light tracking-wider mb-4" style={{ color: textColor }}>
             {invitation.bride_name}
           </h1>
           
           <div className="flex items-center justify-center gap-6 my-6">
-            <div className="w-16 h-px" style={{ backgroundColor: `${primaryColor}30` }} />
-            <span className="text-xl font-light" style={{ color: primaryColor }}>&</span>
-            <div className="w-16 h-px" style={{ backgroundColor: `${primaryColor}30` }} />
+            <div className="w-16 h-px" style={{ backgroundColor: accentColor }} />
+            <span className="text-xl font-light font-serif" style={{ color: textColor }}>&</span>
+            <div className="w-16 h-px" style={{ backgroundColor: accentColor }} />
           </div>
           
-          <h1 className="text-4xl md:text-6xl font-playfair font-light tracking-wider" style={{ color: primaryColor }}>
+          <h1 className="text-4xl md:text-6xl font-playfair font-light tracking-wider" style={{ color: textColor }}>
             {invitation.groom_name}
           </h1>
         </motion.div>
@@ -316,7 +320,7 @@ function MinimalistIntro({ invitation, guestName, onOpen }) {
           transition={{ delay: 1.2 }}
           className="mt-16 mb-12"
         >
-          <div className="inline-block px-8 py-6 border" style={{ borderColor: `${primaryColor}20` }}>
+          <div className="inline-block px-8 py-6 border" style={{ borderColor: borderColor }}>
             <p className="text-gray-400 text-[10px] tracking-[0.3em] uppercase mb-2">Kepada Yth.</p>
             <p className="text-lg text-gray-600 font-light tracking-wide">{guestName}</p>
           </div>
@@ -326,11 +330,11 @@ function MinimalistIntro({ invitation, guestName, onOpen }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.4 }}
-          whileHover={{ backgroundColor: primaryColor, color: '#fff' }}
+          whileHover={{ backgroundColor: textColor, color: '#fff' }}
           whileTap={{ scale: 0.98 }}
           onClick={onOpen}
           className="inline-flex items-center gap-4 px-12 py-4 border text-xs tracking-[0.2em] uppercase transition-all duration-300"
-          style={{ borderColor: primaryColor, color: primaryColor }}
+          style={{ borderColor: textColor, color: textColor }}
         >
           <span>Buka Undangan</span>
           <ChevronDown className="w-4 h-4 animate-bounce" />

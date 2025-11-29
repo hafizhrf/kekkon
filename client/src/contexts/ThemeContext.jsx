@@ -9,7 +9,8 @@ const getInitialTheme = () => {
   if (saved === 'dark') return true;
   if (saved === 'light') return false;
   
-  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  // Default to light theme instead of following system preference
+  return false;
 };
 
 export function ThemeProvider({ children }) {

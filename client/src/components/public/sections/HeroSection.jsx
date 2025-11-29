@@ -238,20 +238,36 @@ function ModernHero({ invitation }) {
 
 // ============================================
 // MINIMALIST ELEGANT - Full width photo background with overlay
+// Monochrome palette with serif typography
+// Mobile: uses separate mobile image if available, Desktop: cover center
 // ============================================
 function MinimalistHero({ invitation }) {
   const countdown = useCountdown(invitation.wedding_date, invitation.enable_countdown);
-  const primaryColor = invitation.primary_color || '#D4A373';
+  // Use monochrome colors for minimalist elegant
+  const hasImage = !!invitation.home_image;
+  const hasMobileImage = !!invitation.home_image_mobile;
+  const textColor = hasImage || hasMobileImage ? 'white' : '#1f2937'; // white or dark gray
+  const accentColor = hasImage || hasMobileImage ? 'rgba(255,255,255,0.4)' : '#d1d5db'; // subtle gray
 
   return (
     <section id="home" className="min-h-screen relative overflow-hidden pt-16">
       {/* Background - either photo or white */}
-      {invitation.home_image ? (
+      {(hasImage || hasMobileImage) ? (
         <>
-          <div 
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${invitation.home_image})` }}
-          />
+          {/* Desktop image - hidden on mobile if mobile image exists */}
+          {hasImage && (
+            <div 
+              className={`absolute inset-0 bg-cover bg-center ${hasMobileImage ? 'hidden md:block' : ''}`}
+              style={{ backgroundImage: `url(${invitation.home_image})` }}
+            />
+          )}
+          {/* Mobile image - only shown on mobile */}
+          {hasMobileImage && (
+            <div 
+              className="absolute inset-0 bg-cover bg-center md:hidden"
+              style={{ backgroundImage: `url(${invitation.home_image_mobile})` }}
+            />
+          )}
           <div className="absolute inset-0 bg-black/40" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30" />
         </>
@@ -265,7 +281,7 @@ function MinimalistHero({ invitation }) {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
         className="absolute inset-8 md:inset-16 border pointer-events-none"
-        style={{ borderColor: invitation.home_image ? 'rgba(255,255,255,0.3)' : `${primaryColor}20` }}
+        style={{ borderColor: (hasImage || hasMobileImage) ? 'rgba(255,255,255,0.3)' : '#e5e7eb' }}
       />
 
       {/* Corner accents */}
@@ -276,7 +292,7 @@ function MinimalistHero({ invitation }) {
           animate={{ scale: 1 }}
           transition={{ delay: 0.7 + i * 0.1 }}
           className={`absolute ${pos} w-2 h-2 md:w-3 md:h-3`}
-          style={{ backgroundColor: invitation.home_image ? 'white' : primaryColor, opacity: invitation.home_image ? 0.6 : 0.4 }}
+          style={{ backgroundColor: (hasImage || hasMobileImage) ? 'white' : '#374151', opacity: (hasImage || hasMobileImage) ? 0.6 : 0.4 }}
         />
       ))}
 
@@ -292,37 +308,37 @@ function MinimalistHero({ invitation }) {
             animate={{ width: 60 }}
             transition={{ delay: 0.6 }}
             className="h-px mx-auto mb-8"
-            style={{ backgroundColor: invitation.home_image ? 'white' : primaryColor, opacity: 0.5 }}
+            style={{ backgroundColor: accentColor }}
           />
 
           <p 
-            className="tracking-[0.4em] uppercase text-[10px] mb-8"
-            style={{ color: invitation.home_image ? 'rgba(255,255,255,0.7)' : '#9ca3af' }}
+            className="tracking-[0.4em] uppercase text-[10px] mb-8 font-serif"
+            style={{ color: hasImage ? 'rgba(255,255,255,0.7)' : '#6b7280' }}
           >
             The Wedding of
           </p>
 
           <h1 
             className="text-5xl md:text-7xl font-playfair font-light tracking-wider mb-4"
-            style={{ color: invitation.home_image ? 'white' : primaryColor }}
+            style={{ color: textColor }}
           >
             {invitation.bride_name}
           </h1>
           
           <div className="flex items-center justify-center gap-6 my-6">
-            <div className="w-16 h-px" style={{ backgroundColor: invitation.home_image ? 'rgba(255,255,255,0.4)' : `${primaryColor}40` }} />
+            <div className="w-16 h-px" style={{ backgroundColor: accentColor }} />
             <span 
-              className="text-2xl font-light"
-              style={{ color: invitation.home_image ? 'white' : primaryColor }}
+              className="text-2xl font-light font-serif"
+              style={{ color: textColor }}
             >
               &
             </span>
-            <div className="w-16 h-px" style={{ backgroundColor: invitation.home_image ? 'rgba(255,255,255,0.4)' : `${primaryColor}40` }} />
+            <div className="w-16 h-px" style={{ backgroundColor: accentColor }} />
           </div>
           
           <h1 
             className="text-5xl md:text-7xl font-playfair font-light tracking-wider"
-            style={{ color: invitation.home_image ? 'white' : primaryColor }}
+            style={{ color: textColor }}
           >
             {invitation.groom_name}
           </h1>
@@ -333,8 +349,8 @@ function MinimalistHero({ invitation }) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.9 }}
-              className="mt-12 text-lg tracking-wide"
-              style={{ color: invitation.home_image ? 'rgba(255,255,255,0.8)' : '#6b7280' }}
+              className="mt-12 text-lg tracking-wide font-serif"
+              style={{ color: hasImage ? 'rgba(255,255,255,0.8)' : '#6b7280' }}
             >
               {format(new Date(invitation.wedding_date), 'EEEE, d MMMM yyyy', { locale: id })}
             </motion.p>
@@ -357,14 +373,14 @@ function MinimalistHero({ invitation }) {
                 ].map((item) => (
                   <div key={item.label} className="text-center">
                     <p 
-                      className="text-3xl md:text-4xl font-light"
-                      style={{ color: invitation.home_image ? 'white' : primaryColor }}
+                      className="text-3xl md:text-4xl font-light font-playfair"
+                      style={{ color: textColor }}
                     >
                       {String(item.value).padStart(2, '0')}
                     </p>
                     <p 
                       className="text-[10px] uppercase tracking-wider mt-1"
-                      style={{ color: invitation.home_image ? 'rgba(255,255,255,0.6)' : '#9ca3af' }}
+                      style={{ color: hasImage ? 'rgba(255,255,255,0.6)' : '#9ca3af' }}
                     >
                       {item.label}
                     </p>
@@ -379,7 +395,7 @@ function MinimalistHero({ invitation }) {
             animate={{ width: 60 }}
             transition={{ delay: 1.1 }}
             className="h-px mx-auto mt-12"
-            style={{ backgroundColor: invitation.home_image ? 'white' : primaryColor, opacity: 0.5 }}
+            style={{ backgroundColor: accentColor }}
           />
         </motion.div>
       </div>
@@ -396,13 +412,13 @@ function MinimalistHero({ invitation }) {
             animate={{ y: [0, 6, 0] }}
             transition={{ duration: 1.5, repeat: Infinity }}
             className="w-5 h-8 rounded-full border flex justify-center pt-1.5"
-            style={{ borderColor: invitation.home_image ? 'rgba(255,255,255,0.5)' : `${primaryColor}50` }}
+            style={{ borderColor: hasImage ? 'rgba(255,255,255,0.5)' : '#d1d5db' }}
           >
             <motion.div
               animate={{ opacity: [1, 0], y: [0, 8] }}
               transition={{ duration: 1.5, repeat: Infinity }}
               className="w-1 h-1 rounded-full"
-              style={{ backgroundColor: invitation.home_image ? 'white' : primaryColor }}
+              style={{ backgroundColor: hasImage ? 'white' : '#6b7280' }}
             />
           </motion.div>
         </a>

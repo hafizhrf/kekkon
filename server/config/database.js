@@ -208,6 +208,18 @@ export function initializeDatabase() {
     console.log('Migration check for home_image:', err.message);
   }
 
+  // Migration: Add home_image_mobile to invitation_content
+  try {
+    const tableInfo = db.prepare("PRAGMA table_info(invitation_content)").all();
+    const hasHomeImageMobile = tableInfo.some(col => col.name === 'home_image_mobile');
+    if (!hasHomeImageMobile) {
+      db.exec("ALTER TABLE invitation_content ADD COLUMN home_image_mobile TEXT");
+      console.log('Migration: Added home_image_mobile to invitation_content');
+    }
+  } catch (err) {
+    console.log('Migration check for home_image_mobile:', err.message);
+  }
+
   const templatesExist = db.prepare('SELECT COUNT(*) as count FROM templates').get();
   if (templatesExist.count === 0) {
     const insertTemplate = db.prepare(`

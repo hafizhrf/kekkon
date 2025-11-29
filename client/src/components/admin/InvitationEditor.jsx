@@ -2,10 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { invitationAPI, templateAPI, uploadAPI } from '../../utils/api';
-import { ArrowLeft, ArrowRight, Upload, X, Check, Eye, Heart, Sparkles, Image, Music, Settings, Send, Palette, Type, Calendar, MapPin, Clock, User, Users, Gift, CreditCard, Wallet, Plus, Trash2, Moon, Church, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Upload, X, Check, Eye, Heart, Sparkles, Image, Music, Settings, Send, Palette, Type, Calendar, MapPin, Clock, User, Users, Gift, CreditCard, Wallet, Plus, Trash2, Moon, Church, AlertTriangle, Copy, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
-import { motion } from 'framer-motion';
 import RichTextEditor from '../shared/RichTextEditor';
 import CustomSelect from '../shared/CustomSelect';
 
@@ -46,7 +45,7 @@ const COLOR_PALETTES = [
   { name: 'Blush & Gold', primary: '#E5989B', secondary: '#FDE2E4', accent: '#FFB4A2' },
   { name: 'Emerald Dream', primary: '#52B788', secondary: '#D8F3DC', accent: '#74C69D' },
   { name: 'Ocean Breeze', primary: '#A2D2FF', secondary: '#BDE0FE', accent: '#CDB4DB' },
-  { name: 'Sunset Vibe', primary: '#B5838D', secondary: '#FFB4A2', accent: '#6D6875' },
+  { name: 'Monochrome', primary: '#1f2937', secondary: '#f9fafb', accent: '#6b7280' },
   { name: 'Royal Purple', primary: '#7B68EE', secondary: '#E6E6FA', accent: '#9370DB' },
 ];
 
@@ -167,6 +166,7 @@ export default function InvitationEditor() {
     main_image_1: '',
     main_image_2: '',
     home_image: '',
+    home_image_mobile: '',
     wedding_date: '',
     akad_time: '',
     akad_venue: '',
@@ -234,6 +234,7 @@ export default function InvitationEditor() {
         main_image_1: inv.main_image_1 || '',
         main_image_2: inv.main_image_2 || '',
         home_image: inv.home_image || '',
+        home_image_mobile: inv.home_image_mobile || '',
         wedding_date: inv.wedding_date ? inv.wedding_date.split('T')[0] : '',
         akad_time: inv.akad_time || '',
         akad_venue: inv.akad_venue || '',
@@ -377,17 +378,28 @@ export default function InvitationEditor() {
     }
   };
 
-  const ImageUploader = ({ currentImage, onUpload, onRemove, label, isUploading }) => {
-    const onDrop = useCallback((acceptedFiles) => {
+  const ImageUploader = ({ currentImage, onUpload, onRemove, label, isUploading, maxSizeMB = 2 }) => {
+    const [sizeError, setSizeError] = useState(null);
+    const maxSizeBytes = maxSizeMB * 1024 * 1024;
+
+    const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
+      setSizeError(null);
+      if (rejectedFiles && rejectedFiles.length > 0) {
+        const rejection = rejectedFiles[0];
+        if (rejection.errors.some(e => e.code === 'file-too-large')) {
+          setSizeError(`Ukuran file terlalu besar. Maksimal ${maxSizeMB}MB`);
+          return;
+        }
+      }
       if (acceptedFiles[0]) {
         onUpload(acceptedFiles[0]);
       }
-    }, [onUpload]);
+    }, [onUpload, maxSizeMB]);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
       onDrop,
       accept: { 'image/*': ['.jpeg', '.jpg', '.png', '.webp'] },
-      maxSize: 2 * 1024 * 1024,
+      maxSize: maxSizeBytes,
       multiple: false,
     });
 
@@ -398,7 +410,7 @@ export default function InvitationEditor() {
           {...getRootProps()}
           className={`relative rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer
             ${currentImage ? 'bg-gray-100' : 'border-2 border-dashed'}
-            ${isDragActive ? 'border-amber-400 bg-amber-50' : 'border-gray-200 hover:border-amber-300 hover:bg-amber-50/30'}`}
+            ${sizeError ? 'border-red-400 bg-red-50' : isDragActive ? 'border-amber-400 bg-amber-50' : 'border-gray-200 hover:border-amber-300 hover:bg-amber-50/30'}`}
         >
           <input {...getInputProps()} />
           {isUploading ? (
@@ -433,14 +445,14 @@ export default function InvitationEditor() {
             </div>
           ) : (
             <div className="h-48 flex flex-col items-center justify-center gap-3 p-6">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center">
-                <Upload className="w-6 h-6 text-amber-600" />
+              <div className={`w-14 h-14 rounded-full flex items-center justify-center ${sizeError ? 'bg-red-100' : 'bg-gradient-to-br from-amber-100 to-orange-100'}`}>
+                <Upload className={`w-6 h-6 ${sizeError ? 'text-red-500' : 'text-amber-600'}`} />
               </div>
               <div className="text-center">
-                <p className="text-sm font-medium text-gray-700">
-                  {isDragActive ? 'Lepaskan file di sini' : 'Drag & drop atau klik'}
+                <p className={`text-sm font-medium ${sizeError ? 'text-red-600' : 'text-gray-700'}`}>
+                  {sizeError ? sizeError : isDragActive ? 'Lepaskan file di sini' : 'Drag & drop atau klik'}
                 </p>
-                <p className="text-xs text-gray-400 mt-1">JPG, PNG, WebP (Max 2MB)</p>
+                <p className="text-xs text-gray-400 mt-1">JPG, PNG, WebP (Max {maxSizeMB}MB)</p>
               </div>
             </div>
           )}
@@ -927,12 +939,25 @@ export default function InvitationEditor() {
                       <p className="text-xs text-gray-500">Ditampilkan setelah section mempelai</p>
                     </div>
                   </div>
+                  
+                  {/* Alert for main image ratio */}
+                  <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl mb-4">
+                    <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm text-amber-800 font-medium">Rekomendasi Ukuran Gambar</p>
+                      <p className="text-xs text-amber-600 mt-1">
+                        Gunakan gambar dengan rasio <strong>21:9 (ultrawide)</strong> atau resolusi <strong>2560x1080</strong> untuk tampilan panorama yang optimal di semua perangkat.
+                      </p>
+                    </div>
+                  </div>
+                  
                   <ImageUploader
                     label="Upload Foto"
                     currentImage={formData.main_image_1}
                     onUpload={(file) => handleImageUpload(file, 'main_image_1')}
                     onRemove={() => handleChange('main_image_1', '')}
                     isUploading={uploadingImage === 'main_image_1'}
+                    maxSizeMB={5}
                   />
                 </div>
               </div>
@@ -1239,15 +1264,26 @@ export default function InvitationEditor() {
                       <p className="text-xs text-gray-500">Ditampilkan setelah section acara/alamat</p>
                     </div>
                   </div>
-                  <div className="max-w-md">
-                    <ImageUploader
-                      label="Upload Foto"
-                      currentImage={formData.main_image_2}
-                      onUpload={(file) => handleImageUpload(file, 'main_image_2')}
-                      onRemove={() => handleChange('main_image_2', '')}
-                      isUploading={uploadingImage === 'main_image_2'}
-                    />
+                  
+                  {/* Alert for main image ratio */}
+                  <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl mb-4">
+                    <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm text-amber-800 font-medium">Rekomendasi Ukuran Gambar</p>
+                      <p className="text-xs text-amber-600 mt-1">
+                        Gunakan gambar dengan rasio <strong>21:9 (ultrawide)</strong> atau resolusi <strong>2560x1080</strong> untuk tampilan panorama yang optimal di semua perangkat.
+                      </p>
+                    </div>
                   </div>
+                  
+                  <ImageUploader
+                    label="Upload Foto"
+                    currentImage={formData.main_image_2}
+                    onUpload={(file) => handleImageUpload(file, 'main_image_2')}
+                    onRemove={() => handleChange('main_image_2', '')}
+                    isUploading={uploadingImage === 'main_image_2'}
+                    maxSizeMB={5}
+                  />
                 </div>
               </div>
             )}
@@ -1266,15 +1302,67 @@ export default function InvitationEditor() {
                       <p className="text-xs text-gray-500">Foto pasangan bersama yang tampil di section countdown. Biasanya foto berdua yang romantis.</p>
                     </div>
                   </div>
+                  
+                  {/* Alert for minimalist-elegant template */}
+                  {formData.template_id === 'minimalist-elegant' && (
+                    <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-xl mb-4 max-w-md">
+                      <AlertTriangle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-sm text-blue-800 font-medium">Rekomendasi Ukuran Gambar</p>
+                        <p className="text-xs text-blue-600 mt-1">
+                          Template <strong>Minimalist Elegant</strong> menggunakan foto sebagai background fullscreen. 
+                          Gunakan gambar dengan rasio <strong>18:9</strong> atau resolusi <strong>Full HD (1920x1080)</strong> untuk hasil terbaik.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Alert for other templates */}
+                  {formData.template_id !== 'minimalist-elegant' && (
+                    <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl mb-4 max-w-md">
+                      <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-sm text-amber-800 font-medium">Rekomendasi Ukuran Gambar</p>
+                        <p className="text-xs text-amber-600 mt-1">
+                          Untuk template ini, disarankan menggunakan foto dengan orientasi <strong>portrait (vertikal)</strong> untuk tampilan yang optimal.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  
                   <div className="max-w-md">
                     <ImageUploader
-                      label="Upload Foto Pasangan"
+                      label="Upload Foto Pasangan (Desktop)"
                       currentImage={formData.home_image}
                       onUpload={(file) => handleImageUpload(file, 'home_image')}
                       onRemove={() => handleChange('home_image', '')}
                       isUploading={uploadingImage === 'home_image'}
+                      maxSizeMB={5}
                     />
                   </div>
+
+                  {/* Mobile Home Image - Only for minimalist-elegant */}
+                  {formData.template_id === 'minimalist-elegant' && (
+                    <div className="max-w-md mt-6">
+                      <div className="flex items-start gap-3 p-4 bg-violet-50 border border-violet-200 rounded-xl mb-4">
+                        <AlertTriangle className="w-5 h-5 text-violet-500 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-sm text-violet-800 font-medium">Foto Versi Mobile</p>
+                          <p className="text-xs text-violet-600 mt-1">
+                            Upload foto terpisah untuk tampilan mobile. Disarankan menggunakan foto dengan orientasi <strong>portrait (vertikal)</strong> untuk hasil optimal di layar HP.
+                          </p>
+                        </div>
+                      </div>
+                      <ImageUploader
+                        label="Upload Foto Pasangan (Mobile)"
+                        currentImage={formData.home_image_mobile}
+                        onUpload={(file) => handleImageUpload(file, 'home_image_mobile')}
+                        onRemove={() => handleChange('home_image_mobile', '')}
+                        isUploading={uploadingImage === 'home_image_mobile'}
+                        maxSizeMB={5}
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -1307,7 +1395,7 @@ export default function InvitationEditor() {
                     />
                     <label 
                       htmlFor="music-upload" 
-                      className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl cursor-pointer hover:shadow-lg transition-all"
+                      className="flex items-center gap-2 px-5 py-3 bg-linear-to-r from-violet-500 to-purple-500 text-white rounded-xl cursor-pointer hover:shadow-lg transition-all"
                     >
                       <Upload className="w-4 h-4" />
                       Upload MP3
@@ -1691,83 +1779,14 @@ export default function InvitationEditor() {
 
             {/* Step 7: Publish */}
             {step === 7 && (
-              <div className="text-center py-8">
-                {publishedSlug ? (
-                  <div className="space-y-8">
-                    <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-emerald-400 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-200">
-                      <Check className="w-12 h-12 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-bold text-gray-800 mb-2">Undangan Berhasil Dipublish!</h3>
-                      <p className="text-gray-500">Bagikan link di bawah ini ke tamu undangan</p>
-                    </div>
-                    <div className="max-w-md mx-auto p-6 bg-gray-50 rounded-2xl">
-                      <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Link Undangan</p>
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="text"
-                          value={`${window.location.origin}/${publishedSlug}`}
-                          readOnly
-                          className="flex-1 px-4 py-3 bg-white border-0 rounded-xl text-sm"
-                        />
-                        <button
-                          onClick={() => navigator.clipboard.writeText(`${window.location.origin}/${publishedSlug}`)}
-                          className="px-5 py-3 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors"
-                        >
-                          Salin
-                        </button>
-                      </div>
-                    </div>
-                    <div className="flex justify-center gap-4">
-                      <a
-                        href={`/${publishedSlug}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
-                      >
-                        <Eye className="w-5 h-5" />
-                        Lihat Undangan
-                      </a>
-                      <button 
-                        onClick={() => navigate('/dashboard')} 
-                        className="px-6 py-3 bg-gradient-to-r from-amber-400 to-orange-400 text-white rounded-xl font-medium hover:shadow-lg transition-all"
-                      >
-                        Ke Dashboard
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-8">
-                    <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center">
-                      <Send className="w-10 h-10 text-amber-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-bold text-gray-800 mb-2">Siap Publish?</h3>
-                      <p className="text-gray-500 max-w-md mx-auto">
-                        Pastikan semua data sudah benar. Setelah dipublish, undangan dapat dibagikan ke tamu.
-                      </p>
-                    </div>
-                    <div className="max-w-md mx-auto p-6 bg-amber-50 rounded-2xl text-left">
-                      <p className="text-xs text-amber-600 uppercase tracking-wider font-semibold mb-3">Ringkasan</p>
-                      <div className="space-y-2 text-sm text-gray-700">
-                        <p><span className="text-gray-400">Mempelai:</span> {formData.bride_name} & {formData.groom_name}</p>
-                        <p><span className="text-gray-400">Tanggal:</span> {formData.wedding_date || '-'}</p>
-                        <p><span className="text-gray-400">Template:</span> {formData.template_id}</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={handlePublish}
-                      disabled={publishing || !id}
-                      className="px-10 py-4 bg-gradient-to-r from-amber-400 to-orange-400 text-white rounded-2xl font-semibold text-lg hover:shadow-xl hover:shadow-amber-200 disabled:opacity-50 transition-all"
-                    >
-                      {publishing ? 'Publishing...' : 'Publish Sekarang'}
-                    </button>
-                    {!id && (
-                      <p className="text-sm text-gray-400">Simpan draft terlebih dahulu sebelum publish</p>
-                    )}
-                  </div>
-                )}
-              </div>
+              <PublishStep 
+                publishedSlug={publishedSlug}
+                formData={formData}
+                publishing={publishing}
+                id={id}
+                handlePublish={handlePublish}
+                navigate={navigate}
+              />
             )}
           </div>
 
@@ -1794,6 +1813,114 @@ export default function InvitationEditor() {
             </div>
           )}
         </motion.div>
+      </div>
+    </div>
+  );
+}
+
+// Publish Step Component - simple version without guest name input
+// Guest name input is only available in Dashboard share modal
+function PublishStep({ publishedSlug, formData, publishing, id, handlePublish, navigate }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = () => {
+    const url = `${window.location.origin}/${publishedSlug}`;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  if (publishedSlug) {
+    return (
+      <div className="text-center py-8">
+        <div className="space-y-8">
+          <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-emerald-400 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-200">
+            <Check className="w-12 h-12 text-white" />
+          </div>
+          <div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">Undangan Berhasil Dipublish!</h3>
+            <p className="text-gray-500">Bagikan link di bawah ini ke tamu undangan</p>
+          </div>
+
+          {/* Link Preview */}
+          <div className="max-w-md mx-auto p-6 bg-gray-50 rounded-2xl">
+            <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Link Undangan</p>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={`${window.location.origin}/${publishedSlug}`}
+                readOnly
+                className="flex-1 px-4 py-3 bg-white border-0 rounded-xl text-sm"
+              />
+              <button
+                onClick={handleCopyLink}
+                className="px-5 py-3 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors"
+              >
+                {copied ? 'Tersalin!' : 'Salin'}
+              </button>
+            </div>
+          </div>
+
+          {/* Info */}
+          <div className="max-w-md mx-auto p-4 bg-amber-50 rounded-xl">
+            <p className="text-xs text-amber-700">
+              <strong>Tips:</strong> Untuk membagikan undangan dengan nama tamu personal, gunakan fitur "Bagikan" di Dashboard.
+            </p>
+          </div>
+
+          {/* Actions */}
+          <div className="flex justify-center gap-4">
+            <a
+              href={`/${publishedSlug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+            >
+              <Eye className="w-5 h-5" />
+              Lihat Undangan
+            </a>
+            <button 
+              onClick={() => navigate('/dashboard')} 
+              className="px-6 py-3 bg-gradient-to-r from-amber-400 to-orange-400 text-white rounded-xl font-medium hover:shadow-lg transition-all"
+            >
+              Ke Dashboard
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="text-center py-8">
+      <div className="space-y-8">
+        <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center">
+          <Send className="w-10 h-10 text-amber-600" />
+        </div>
+        <div>
+          <h3 className="text-2xl font-bold text-gray-800 mb-2">Siap Publish?</h3>
+          <p className="text-gray-500 max-w-md mx-auto">
+            Pastikan semua data sudah benar. Setelah dipublish, undangan dapat dibagikan ke tamu.
+          </p>
+        </div>
+        <div className="max-w-md mx-auto p-6 bg-amber-50 rounded-2xl text-left">
+          <p className="text-xs text-amber-600 uppercase tracking-wider font-semibold mb-3">Ringkasan</p>
+          <div className="space-y-2 text-sm text-gray-700">
+            <p><span className="text-gray-400">Mempelai:</span> {formData.bride_name} & {formData.groom_name}</p>
+            <p><span className="text-gray-400">Tanggal:</span> {formData.wedding_date || '-'}</p>
+            <p><span className="text-gray-400">Template:</span> {formData.template_id}</p>
+          </div>
+        </div>
+        <button
+          onClick={handlePublish}
+          disabled={publishing || !id}
+          className="px-10 py-4 bg-gradient-to-r from-amber-400 to-orange-400 text-white rounded-2xl font-semibold text-lg hover:shadow-xl hover:shadow-amber-200 disabled:opacity-50 transition-all"
+        >
+          {publishing ? 'Publishing...' : 'Publish Sekarang'}
+        </button>
+        {!id && (
+          <p className="text-sm text-gray-400">Simpan draft terlebih dahulu sebelum publish</p>
+        )}
       </div>
     </div>
   );

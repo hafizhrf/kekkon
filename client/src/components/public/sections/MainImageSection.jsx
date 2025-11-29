@@ -145,7 +145,12 @@ export default function MainImageSection({ invitation, imageUrl, position = 1 })
   return (
     <section 
       ref={sectionRef}
-      className="relative w-full h-[70vh] md:h-[85vh] overflow-hidden"
+      className="relative w-full overflow-hidden"
+      style={{ 
+        // Use aspect ratio for consistent display across devices
+        // 21:9 = 2.33:1 ratio, using padding-bottom trick for aspect ratio
+        aspectRatio: '21/9'
+      }}
     >
       {/* Parallax Image */}
       <motion.div
@@ -155,7 +160,7 @@ export default function MainImageSection({ invitation, imageUrl, position = 1 })
         <img
           src={imageUrl}
           alt="Wedding moment"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover object-center"
         />
       </motion.div>
 

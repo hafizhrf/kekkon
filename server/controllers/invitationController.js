@@ -94,6 +94,7 @@ export function createInvitation(req, res) {
       main_image_1,
       main_image_2,
       home_image,
+      home_image_mobile,
       wedding_date,
       akad_time,
       akad_venue,
@@ -143,12 +144,12 @@ export function createInvitation(req, res) {
       INSERT INTO invitation_content (
         invitation_id, is_muslim, bride_name, bride_parents, bride_photo, bride_instagram,
         groom_name, groom_parents, groom_photo, groom_instagram,
-        main_image_1, main_image_2, home_image,
+        main_image_1, main_image_2, home_image, home_image_mobile,
         wedding_date, akad_time, akad_venue, akad_address, akad_lat, akad_lng,
         reception_time, reception_venue, reception_address, reception_lat, reception_lng,
         music_url, story_text, gallery_images, custom_fields,
         gift_bank_accounts, gift_ewallets, gift_address, gift_wishlist, enable_gift
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       invitationId,
       is_muslim ? 1 : 0,
@@ -163,6 +164,7 @@ export function createInvitation(req, res) {
       main_image_1 || null,
       main_image_2 || null,
       home_image || null,
+      home_image_mobile || null,
       wedding_date,
       akad_time || null,
       akad_venue || null,
@@ -228,6 +230,7 @@ export function updateInvitation(req, res) {
       main_image_1,
       main_image_2,
       home_image,
+      home_image_mobile,
       wedding_date,
       akad_time,
       akad_venue,
@@ -293,6 +296,7 @@ export function updateInvitation(req, res) {
         main_image_1 = COALESCE(?, main_image_1),
         main_image_2 = COALESCE(?, main_image_2),
         home_image = COALESCE(?, home_image),
+        home_image_mobile = COALESCE(?, home_image_mobile),
         wedding_date = COALESCE(?, wedding_date),
         akad_time = COALESCE(?, akad_time),
         akad_venue = COALESCE(?, akad_venue),
@@ -327,6 +331,7 @@ export function updateInvitation(req, res) {
       main_image_1,
       main_image_2,
       home_image,
+      home_image_mobile,
       wedding_date,
       akad_time,
       akad_venue,

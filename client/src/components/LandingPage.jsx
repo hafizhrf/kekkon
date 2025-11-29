@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import {  AnimatePresence } from 'framer-motion';
 import { Sparkles, Users, Share2, Palette, Music, Check, ArrowRight, Star, LayoutDashboard, Menu, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { KekkonLogo, KekkonIcon } from './shared/Logo';
@@ -11,6 +11,9 @@ import StackedLeavesSvg from '../assets/svg/elegant-themed/stacked-leaves-2.svg'
 import StackedLeaves2Svg from '../assets/svg/elegant-themed/stacked-leaves.svg';
 import StackedLeaves3Svg from '../assets/svg/elegant-themed/stacked-leaves-3.svg';
 import CornerBorderSvg from '../assets/svg/elegant-themed/corner-border.svg';
+
+// Import hero image
+import HeroImage from '../assets/images/landing-page-hero.jpg';
 
 export default function LandingPage() {
   const { user } = useAuth();
@@ -123,174 +126,188 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 relative overflow-hidden">
-        {/* Palm Tree-like Leaf Decorations - Left Side */}
-        <div className="absolute top-0 left-0 hidden lg:block pointer-events-none" style={{ height: '100%' }}>
-          {/* Main trunk/stem effect */}
-          <div className="absolute left-8 top-20 bottom-20 w-0.5 bg-gradient-to-b from-amber-300/20 via-amber-400/30 to-amber-300/10" />
-          
-          {/* Top leaves */}
-          <motion.div 
-            className="absolute top-16 left-0"
-            animate={{ rotate: [-3, 5, -3], y: [0, -5, 0] }}
-            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            <img src={StackedLeavesSvg} alt="" className="w-36 h-auto opacity-50" />
-          </motion.div>
-          
-          {/* Middle leaves */}
-          <motion.div 
-            className="absolute top-1/3 -left-4"
-            animate={{ rotate: [5, -5, 5], x: [0, 8, 0] }}
-            transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-          >
-            <img src={StackedLeaves2Svg} alt="" className="w-32 h-auto opacity-35" />
-          </motion.div>
-          
-          {/* Lower leaves */}
-          <motion.div 
-            className="absolute top-2/3 left-0"
-            animate={{ rotate: [-4, 6, -4], y: [0, 8, 0] }}
-            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-          >
-            <img src={StackedLeaves3Svg} alt="" className="w-28 h-auto opacity-25" />
-          </motion.div>
+      <section className="pt-20 md:pt-24 relative overflow-hidden min-h-screen flex items-center">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={HeroImage} 
+            alt="Wedding couple" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30" />
         </div>
         
-        {/* Palm Tree-like Leaf Decorations - Right Side (mirrored) */}
-        <div className="absolute top-0 right-0 hidden lg:block pointer-events-none" style={{ height: '100%' }}>
-          {/* Main trunk/stem effect */}
-          <div className="absolute right-8 top-20 bottom-20 w-0.5 bg-gradient-to-b from-amber-300/20 via-amber-400/30 to-amber-300/10" />
-          
-          {/* Top leaves */}
-          <motion.div 
-            className="absolute top-16 right-0"
-            animate={{ rotate: [3, -5, 3], y: [0, -5, 0] }}
-            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }}
-          >
-            <img src={StackedLeavesSvg} alt="" className="w-36 h-auto opacity-50" style={{ transform: 'scaleX(-1)' }} />
-          </motion.div>
-          
-          {/* Middle leaves */}
-          <motion.div 
-            className="absolute top-1/3 -right-4"
-            animate={{ rotate: [-5, 5, -5], x: [0, -8, 0] }}
-            transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
-          >
-            <img src={StackedLeaves2Svg} alt="" className="w-32 h-auto opacity-35" style={{ transform: 'scaleX(-1)' }} />
-          </motion.div>
-          
-          {/* Lower leaves */}
-          <motion.div 
-            className="absolute top-2/3 right-0"
-            animate={{ rotate: [4, -6, 4], y: [0, 8, 0] }}
-            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1.3 }}
-          >
-            <img src={StackedLeaves3Svg} alt="" className="w-28 h-auto opacity-25" style={{ transform: 'scaleX(-1)' }} />
-          </motion.div>
-        </div>
-        
-        {/* Corner Border Decorations */}
-        <div className="absolute top-20 left-4 hidden md:block pointer-events-none opacity-15">
-          <img src={CornerBorderSvg} alt="" className="w-20 h-auto" />
-        </div>
-        <div className="absolute top-20 right-4 hidden md:block pointer-events-none opacity-15">
-          <img src={CornerBorderSvg} alt="" className="w-20 h-auto" style={{ transform: 'scaleX(-1)' }} />
-        </div>
-        
-        {/* Background decorations */}
-        <div className="absolute top-20 -left-20 w-72 h-72 bg-amber-200/30 dark:bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-20 -right-20 w-72 sm:w-96 h-72 sm:h-96 bg-orange-200/30 dark:bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
-        
-        <div className="max-w-5xl mx-auto text-center relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-500/20 dark:to-orange-500/20 rounded-full text-sm font-medium text-amber-700 dark:text-amber-400 mb-8">
-              <Sparkles className="w-4 h-4" />
-              100% Gratis - Tanpa Batas
-              <Sparkles className="w-4 h-4" />
-            </div>
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="text-4xl md:text-6xl lg:text-7xl font-playfair font-bold text-gray-800 dark:text-white mb-6 leading-tight"
-          >
-            Buat Undangan
-            <span className="block bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
-              Pernikahan Digital
-            </span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="text-xl text-gray-600 dark:text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed"
-          >
-            Undang tamu dengan cara modern. Buat undangan pernikahan digital
-            dalam hitungan menit dengan template cantik dan fitur lengkap.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
-          >
-            <Link 
-              to={user ? "/dashboard" : "/register"}
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-lg font-semibold rounded-2xl hover:shadow-xl hover:shadow-amber-200 dark:hover:shadow-amber-500/20 transition-all group"
+        <div className="max-w-6xl mx-auto px-4 py-20 relative z-10 w-full">
+          <div className="max-w-2xl">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
             >
-              {user ? (
-                <>
-                  <LayoutDashboard className="w-5 h-5" />
-                  Ke Dashboard
-                </>
-              ) : (
-                <>
-                  Mulai Sekarang
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </>
-              )}
-            </Link>
-            <a 
-              href="#features" 
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-200 text-lg font-semibold rounded-2xl border-2 border-gray-200 dark:border-slate-600 hover:border-amber-300 dark:hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-slate-700 transition-all"
-            >
-              Lihat Fitur
-            </a>
-          </motion.div>
-
-          {/* Trust badges */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
-            className="mt-12 flex items-center justify-center gap-6 text-sm text-gray-500 dark:text-gray-400"
-          >
-            <div className="flex items-center gap-2">
-              <div className="flex -space-x-2">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border-2 border-white dark:border-slate-800 flex items-center justify-center text-white text-xs font-medium">
-                    {String.fromCharCode(65 + i)}
-                  </div>
-                ))}
+              <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium text-white/90 mb-8 border border-white/20">
+                <Sparkles className="w-4 h-4" />
+                100% Gratis - Tanpa Batas
+                <Sparkles className="w-4 h-4" />
               </div>
-              <span>1000+ pasangan sudah menggunakan</span>
-            </div>
-          </motion.div>
+            </motion.div>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="text-4xl md:text-6xl lg:text-7xl font-playfair font-bold text-white mb-6 leading-tight"
+            >
+              Buat Undangan
+              <span className="block bg-gradient-to-r from-amber-300 to-orange-300 bg-clip-text text-transparent">
+                Pernikahan Digital
+              </span>
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="text-lg md:text-xl text-white/80 mb-10 max-w-xl leading-relaxed"
+            >
+              Undang tamu dengan cara modern. Buat undangan pernikahan digital
+              dalam hitungan menit dengan template cantik dan fitur lengkap.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+              className="flex flex-col sm:flex-row gap-4"
+            >
+              <Link 
+                to={user ? "/dashboard" : "/register"}
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-lg font-semibold rounded-2xl hover:shadow-xl hover:shadow-amber-500/30 transition-all group"
+              >
+                {user ? (
+                  <>
+                    <LayoutDashboard className="w-5 h-5" />
+                    Ke Dashboard
+                  </>
+                ) : (
+                  <>
+                    Mulai Sekarang
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
+              </Link>
+              <a 
+                href="#features" 
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-sm text-white text-lg font-semibold rounded-2xl border border-white/30 hover:bg-white/20 transition-all"
+              >
+                Lihat Fitur
+              </a>
+            </motion.div>
+
+            {/* Trust badges */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1 }}
+              className="mt-12 flex items-center gap-4 text-sm text-white/70"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex -space-x-2">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border-2 border-white/30 flex items-center justify-center text-white text-xs font-medium">
+                      {String.fromCharCode(65 + i)}
+                    </div>
+                  ))}
+                </div>
+                <span>1000+ pasangan sudah menggunakan</span>
+              </div>
+            </motion.div>
+          </div>
         </div>
+
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
+        >
+          <a href="#features" className="flex flex-col items-center text-white/60 hover:text-white/80 transition-colors">
+            <span className="text-xs uppercase tracking-widest mb-2">Scroll</span>
+            <motion.div
+              animate={{ y: [0, 8, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              className="w-6 h-10 rounded-full border-2 border-white/40 flex justify-center pt-2"
+            >
+              <motion.div
+                animate={{ opacity: [1, 0], y: [0, 12] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+                className="w-1.5 h-1.5 rounded-full bg-white/60"
+              />
+            </motion.div>
+          </a>
+        </motion.div>
       </section>
 
       {/* Features Section */}
-      <section className="py-24 bg-white dark:bg-slate-800" id="features">
-        <div className="max-w-6xl mx-auto px-4">
+      <section className="py-24 bg-white dark:bg-slate-800 relative overflow-hidden" id="features">
+        {/* Decorative Stacked Leaves - Left Side (Desktop Only) */}
+        <div className="hidden md:block absolute bottom-0 left-0 pointer-events-none">
+          <motion.img 
+            src={StackedLeavesSvg} 
+            alt="" 
+            className="w-32 lg:w-40 opacity-30 dark:opacity-20 -scale-x-100"
+            style={{ transformOrigin: 'bottom center' }}
+            animate={{ rotate: [-2, 2, -2] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.img 
+            src={StackedLeaves2Svg} 
+            alt="" 
+            className="w-28 lg:w-36 opacity-25 dark:opacity-15 absolute bottom-0 left-8 -scale-x-100"
+            style={{ transformOrigin: 'bottom center' }}
+            animate={{ rotate: [2, -2, 2] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+          />
+          <motion.img 
+            src={StackedLeaves3Svg} 
+            alt="" 
+            className="w-24 lg:w-32 opacity-20 dark:opacity-10 absolute bottom-0 left-16 -scale-x-100"
+            style={{ transformOrigin: 'bottom center' }}
+            animate={{ rotate: [-1, 3, -1] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          />
+        </div>
+
+        {/* Decorative Stacked Leaves - Right Side (Desktop Only) */}
+        <div className="hidden md:block absolute bottom-0 right-0 pointer-events-none">
+          <motion.img 
+            src={StackedLeavesSvg} 
+            alt="" 
+            className="w-32 lg:w-40 opacity-30 dark:opacity-20"
+            style={{ transformOrigin: 'bottom center' }}
+            animate={{ rotate: [2, -2, 2] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+          />
+          <motion.img 
+            src={StackedLeaves2Svg} 
+            alt="" 
+            className="w-28 lg:w-36 opacity-25 dark:opacity-15 absolute bottom-0 right-8"
+            style={{ transformOrigin: 'bottom center' }}
+            animate={{ rotate: [-2, 2, -2] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
+          />
+          <motion.img 
+            src={StackedLeaves3Svg} 
+            alt="" 
+            className="w-24 lg:w-32 opacity-20 dark:opacity-10 absolute bottom-0 right-16"
+            style={{ transformOrigin: 'bottom center' }}
+            animate={{ rotate: [1, -3, 1] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1.3 }}
+          />
+        </div>
+
+        <div className="max-w-6xl mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -309,7 +326,7 @@ export default function LandingPage() {
             </motion.div>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
             {features.map((feature, index) => (
               <motion.div
                 key={feature.title}
@@ -317,13 +334,13 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-slate-700 dark:to-slate-700 rounded-3xl p-8 text-center hover:shadow-lg dark:hover:shadow-amber-500/10 transition-shadow group"
+                className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-slate-700 dark:to-slate-700 rounded-2xl md:rounded-3xl p-4 md:p-8 text-center hover:shadow-lg dark:hover:shadow-amber-500/10 transition-shadow group"
               >
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl mb-6 group-hover:scale-110 transition-transform">
-                  <feature.icon className="w-8 h-8 text-white" />
+                <div className="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl md:rounded-2xl mb-3 md:mb-6 group-hover:scale-110 transition-transform">
+                  <feature.icon className="w-6 h-6 md:w-8 md:h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-3">{feature.title}</h3>
-                <p className="text-gray-600 dark:text-gray-300">{feature.desc}</p>
+                <h3 className="text-sm md:text-xl font-bold text-gray-800 dark:text-white mb-1 md:mb-3">{feature.title}</h3>
+                <p className="text-xs md:text-base text-gray-600 dark:text-gray-300 leading-relaxed">{feature.desc}</p>
               </motion.div>
             ))}
           </div>

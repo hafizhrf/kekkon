@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import {  AnimatePresence } from 'framer-motion';
 import { Heart, Share2, Copy, MessageCircle, Download, X, User, QrCode, Check } from 'lucide-react';
 import { QRCodeSVG, QRCodeCanvas } from 'qrcode.react';
 import { useState, useRef } from 'react';
@@ -7,7 +7,7 @@ import { FloralDivider, FloralCorner, GoldAccent } from '../decorations/Ornament
 
 export default function Footer({ invitation }) {
   const [showShare, setShowShare] = useState(false);
-  const [guestName, setGuestName] = useState('');
+  const [guestName] = useState('');
   const [copied, setCopied] = useState(false);
   const qrRef = useRef(null);
   
@@ -292,25 +292,6 @@ export default function Footer({ invitation }) {
                 >
                   <X className="w-5 h-5 text-gray-500" />
                 </button>
-              </div>
-
-              {/* Guest Name Input */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <User className="w-4 h-4 inline mr-2" style={{ color: primaryColor }} />
-                  Nama Tamu (Opsional)
-                </label>
-                <input
-                  type="text"
-                  value={guestName}
-                  onChange={(e) => setGuestName(e.target.value)}
-                  placeholder="Contoh: Budi Santoso"
-                  className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:ring-2 transition-all"
-                  style={{ '--tw-ring-color': primaryColor }}
-                />
-                <p className="text-xs text-gray-400 mt-2">
-                  Nama akan ditampilkan di undangan sebagai tamu yang diundang
-                </p>
               </div>
 
               {/* QR Code */}

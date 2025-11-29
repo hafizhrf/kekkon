@@ -11,68 +11,59 @@ const SECTIONS = [
   { id: 'rsvp', label: 'RSVP', icon: MessageSquare },
 ];
 
+// Now uses primaryColor from palette for all templates
 const getTemplateStyle = (templateId, primaryColor) => {
-  const styles = {
+  // Base styles that apply to all templates - colors come from primaryColor palette
+  const baseStyle = {
+    container: 'bg-white/90 backdrop-blur-md shadow-lg',
+    mobileContainer: 'bg-white/95 backdrop-blur-md shadow-lg',
+    dot: 'border-2',
+    activeDot: '', // Will use primaryColor directly
+    line: 'bg-gray-200',
+    activeLine: '', // Will use primaryColor directly
+    mobileProgress: '', // Will use primaryColor directly
+  };
+
+  // Template-specific container styles only (not colors)
+  const containerStyles = {
     'geometric-modern': {
       container: 'bg-white/90 backdrop-blur-md shadow-lg',
       mobileContainer: 'bg-white/95 backdrop-blur-md shadow-lg',
       dot: 'border-2',
-      activeDot: 'bg-gradient-to-br from-amber-400 to-orange-500',
-      line: 'bg-gray-200',
-      activeLine: 'bg-gradient-to-b from-amber-400 to-orange-500',
-      mobileProgress: 'bg-gradient-to-r from-amber-400 to-orange-500',
     },
     'minimalist-elegant': {
       container: 'bg-white/80 backdrop-blur-sm shadow-md',
       mobileContainer: 'bg-white/90 backdrop-blur-sm shadow-md',
       dot: 'border',
-      activeDot: 'bg-gray-800',
-      line: 'bg-gray-100',
-      activeLine: 'bg-gray-800',
-      mobileProgress: 'bg-gray-800',
     },
     'floral-romantic': {
-      container: 'bg-rose-50/90 backdrop-blur-md shadow-lg border border-rose-200',
-      mobileContainer: 'bg-rose-50/95 backdrop-blur-md shadow-lg border-t border-rose-200',
-      dot: 'border-2 border-rose-200',
-      activeDot: 'bg-gradient-to-br from-rose-400 to-pink-500',
-      line: 'bg-rose-100',
-      activeLine: 'bg-gradient-to-b from-rose-400 to-pink-500',
-      mobileProgress: 'bg-gradient-to-r from-rose-400 to-pink-500',
+      container: 'bg-white/90 backdrop-blur-md shadow-lg border border-gray-200',
+      mobileContainer: 'bg-white/95 backdrop-blur-md shadow-lg border-t border-gray-200',
+      dot: 'border-2',
     },
     'islamic-traditional': {
-      container: 'bg-emerald-50/90 backdrop-blur-md shadow-lg border border-emerald-200',
-      mobileContainer: 'bg-emerald-50/95 backdrop-blur-md shadow-lg border-t border-emerald-200',
-      dot: 'border-2 border-emerald-200',
-      activeDot: 'bg-gradient-to-br from-emerald-500 to-teal-500',
-      line: 'bg-emerald-100',
-      activeLine: 'bg-gradient-to-b from-emerald-500 to-teal-500',
-      mobileProgress: 'bg-gradient-to-r from-emerald-500 to-teal-500',
+      container: 'bg-white/90 backdrop-blur-md shadow-lg border border-gray-200',
+      mobileContainer: 'bg-white/95 backdrop-blur-md shadow-lg border-t border-gray-200',
+      dot: 'border-2',
     },
     'rustic-vintage': {
-      container: 'bg-amber-50/90 backdrop-blur-md shadow-lg border border-amber-200',
-      mobileContainer: 'bg-amber-50/95 backdrop-blur-md shadow-lg border-t border-amber-200',
-      dot: 'border-2 border-amber-300',
-      activeDot: 'bg-gradient-to-br from-amber-600 to-yellow-600',
-      line: 'bg-amber-200',
-      activeLine: 'bg-gradient-to-b from-amber-600 to-yellow-600',
-      mobileProgress: 'bg-gradient-to-r from-amber-600 to-yellow-600',
+      container: 'bg-white/90 backdrop-blur-md shadow-lg border border-gray-200',
+      mobileContainer: 'bg-white/95 backdrop-blur-md shadow-lg border-t border-gray-200',
+      dot: 'border-2',
     },
     'colorful-playful': {
       container: 'bg-white/90 backdrop-blur-md shadow-lg',
       mobileContainer: 'bg-white/95 backdrop-blur-md shadow-lg',
       dot: 'border-2',
-      activeDot: 'bg-gradient-to-br from-purple-400 to-pink-500',
-      line: 'bg-gray-200',
-      activeLine: 'bg-gradient-to-b from-purple-400 to-pink-500',
-      mobileProgress: 'bg-gradient-to-r from-purple-400 to-pink-500',
     },
   };
 
-  return styles[templateId] || {
-    container: 'bg-white/90 backdrop-blur-md shadow-lg',
-    mobileContainer: 'bg-white/95 backdrop-blur-md shadow-lg',
-    dot: 'border-2',
+  const templateContainer = containerStyles[templateId] || {};
+
+  return {
+    ...baseStyle,
+    ...templateContainer,
+    // Colors now use primaryColor from palette
     activeDot: '',
     line: 'bg-gray-200',
     activeLine: '',
