@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 // Import SVG assets
 import StackedLeavesSvg from '../../../assets/svg/elegant-themed/stacked-leaves.svg';
@@ -15,16 +15,6 @@ export default function MainImageSection({ invitation, imageUrl, position = 1 })
   const primaryColor = invitation.primary_color || '#D4A373';
   const secondaryColor = invitation.secondary_color || '#FEFAE0';
   const templateId = invitation.template_id || 'geometric-modern';
-
-  // Parallax effect
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"]
-  });
-
-  const imageY = useTransform(scrollYProgress, [0, 1], ['0%', '20%']);
-  const imageScale = useTransform(scrollYProgress, [0, 0.5, 1], [1.1, 1, 1.05]);
-  const overlayOpacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.3, 0.1, 0.2]);
 
   // Template-specific decorations
   const getDecorations = () => {
@@ -152,23 +142,20 @@ export default function MainImageSection({ invitation, imageUrl, position = 1 })
         aspectRatio: '21/9'
       }}
     >
-      {/* Parallax Image */}
-      <motion.div
-        className="absolute inset-0 w-full h-full"
-        style={{ y: imageY, scale: imageScale }}
-      >
+      {/* Static Image (no parallax) */}
+      <div className="absolute inset-0 w-full h-full">
         <img
           src={imageUrl}
           alt="Wedding moment"
           className="w-full h-full object-cover object-center"
         />
-      </motion.div>
+      </div>
 
       {/* Subtle gradient overlay */}
-      <motion.div
+      <div
         className="absolute inset-0 pointer-events-none"
         style={{ 
-          opacity: overlayOpacity,
+          opacity: 0.15,
           background: `linear-gradient(to bottom, ${primaryColor}40 0%, transparent 30%, transparent 70%, ${secondaryColor}60 100%)`
         }}
       />

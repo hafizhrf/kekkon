@@ -335,7 +335,45 @@ export default function InvitationEditor() {
   const getGalleryImageUrl = (item) => typeof item === 'string' ? item : item.url;
   const getGalleryImageCaption = (item) => typeof item === 'string' ? '' : (item.caption || '');
 
+  const validateForm = () => {
+    const errors = [];
+    
+    // Required fields validation
+    if (!formData.bride_name?.trim()) {
+      errors.push('Nama mempelai wanita harus diisi');
+    }
+    if (!formData.groom_name?.trim()) {
+      errors.push('Nama mempelai pria harus diisi');
+    }
+    if (!formData.wedding_date) {
+      errors.push('Tanggal pernikahan harus diisi');
+    }
+    
+    // Event validation - at least one event should have details
+    const hasAkadDetails = formData.akad_time || formData.akad_venue;
+    const hasReceptionDetails = formData.reception_time || formData.reception_venue;
+    
+    if (!hasAkadDetails && !hasReceptionDetails) {
+      errors.push('Minimal isi waktu atau tempat untuk salah satu acara (Akad/Resepsi)');
+    }
+    
+    return errors;
+  };
+
   const handleSave = async () => {
+    // Validate before saving
+    const validationErrors = validateForm();
+    if (validationErrors.length > 0) {
+      validationErrors.forEach((error, index) => {
+        setTimeout(() => {
+          toast.error(error, { 
+            duration: 4000,
+          });
+        }, index * 300);
+      });
+      return;
+    }
+
     setSaving(true);
     try {
       // Combine wishlist data

@@ -228,7 +228,7 @@ export default function GiftSection({ invitation }) {
   return (
     <section
       id="gift"
-      className="py-20 md:py-32 relative overflow-hidden bg-white"
+      className="py-20 md:py-32 relative overflow-hidden bg-white paper-texture"
     >
       {/* Decorative Background */}
       <div className="absolute inset-0 pointer-events-none">

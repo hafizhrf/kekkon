@@ -346,7 +346,7 @@ export default function CoupleSection({ invitation, onPhotoClick }) {
     <section 
       ref={sectionRef}
       id="mempelai" 
-      className={`relative overflow-hidden ${theme.sectionBg} ${theme.sectionPadding}`}
+      className={`relative overflow-hidden ${theme.sectionBg} ${theme.sectionPadding} paper-texture`}
     >
       {/* Background decorations */}
       <div 
