@@ -5,14 +5,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Volume2, VolumeX, ChevronDown, Heart, Home, Users, Calendar, Image, Gift, MessageSquare } from 'lucide-react';
 import HeroSection from './sections/HeroSection';
 import CoupleSection from './sections/CoupleSection';
+import MainImageSection from './sections/MainImageSection';
 import EventSection from './sections/EventSection';
 import GallerySection from './sections/GallerySection';
 import GiftSection from './sections/GiftSection';
 import RSVPSection from './sections/RSVPSection';
 import Footer from './sections/Footer';
 import { AdPlaceholder } from '../shared/AdUnit';
-import ScrollTimeline from './ScrollTimeline';
+import ScrollTimeline, { useScrollProgress } from './ScrollTimeline';
 import { KekkonIcon } from '../shared/Logo';
+import PhotoLightbox from './PhotoLightbox';
 import { 
   LoadingScreen, 
   CurtainReveal, 
@@ -23,6 +25,7 @@ import {
   FlowerReveal,
   FadeReveal
 } from './OpeningAnimations';
+import IntroSection from './IntroSection';
 
 export default function InvitationPage() {
   const { slug } = useParams();
@@ -35,7 +38,10 @@ export default function InvitationPage() {
   const [showReveal, setShowReveal] = useState(false);
   const [revealComplete, setRevealComplete] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
+  const [lightboxPhoto, setLightboxPhoto] = useState(null);
+  const [activeSection, setActiveSection] = useState('home');
   const audioRef = useRef(null);
+  const scrollProgress = useScrollProgress();
 
   useEffect(() => {
     loadInvitation();
@@ -47,6 +53,31 @@ export default function InvitationPage() {
       document.title = `Undangan Pernikahan ${invitation.bride_name} & ${invitation.groom_name}`;
     }
   }, [invitation]);
+
+  // Track active section for navbar highlighting
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const viewportMiddle = scrollTop + window.innerHeight / 3;
+      const sectionIds = ['home', 'mempelai', 'acara', 'gallery', 'gift', 'rsvp'];
+      
+      const sections = sectionIds
+        .map(id => document.getElementById(id))
+        .filter(Boolean);
+
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const section = sections[i];
+        if (section && section.offsetTop <= viewportMiddle) {
+          setActiveSection(sectionIds[i]);
+          break;
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const loadInvitation = async () => {
     try {
@@ -136,47 +167,11 @@ export default function InvitationPage() {
 
       <AnimatePresence>
         {!isOpen && (
-          <motion.div
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center"
-            style={{ backgroundColor: invitation.secondary_color }}
-          >
-            <div className="absolute inset-0 overflow-hidden">
-              <GeometricShapes primaryColor={invitation.primary_color} />
-            </div>
-
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="relative z-10 text-center px-6"
-            >
-              <p className="text-gray-600 mb-2 font-medium">The Wedding of</p>
-              <h1
-                className={`text-4xl md:text-6xl font-${invitation.font_family || 'playfair'} font-semibold mb-4`}
-                style={{ color: invitation.primary_color }}
-              >
-                {invitation.bride_name} & {invitation.groom_name}
-              </h1>
-              
-              <div className="my-8">
-                <p className="text-gray-500 mb-2">Kepada Yth.</p>
-                <p className="text-xl font-semibold text-gray-700">{guestName}</p>
-              </div>
-
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleOpen}
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-white font-medium shadow-lg"
-                style={{ backgroundColor: invitation.primary_color }}
-              >
-                Buka Undangan
-                <ChevronDown className="w-5 h-5 animate-bounce" />
-              </motion.button>
-            </motion.div>
-          </motion.div>
+          <IntroSection 
+            invitation={invitation} 
+            guestName={guestName} 
+            onOpen={handleOpen} 
+          />
         )}
       </AnimatePresence>
 
@@ -219,6 +214,18 @@ export default function InvitationPage() {
             transition={{ delay: 1.2, type: "spring" }}
             className="fixed top-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md shadow-sm"
           >
+            {/* Progress bar */}
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-100">
+              <motion.div
+                className="h-full"
+                style={{ 
+                  width: `${scrollProgress}%`,
+                  backgroundColor: invitation.primary_color,
+                }}
+                transition={{ duration: 0.1 }}
+              />
+            </div>
+            
             <div className="max-w-4xl mx-auto px-2 sm:px-4 py-2">
               <div className="flex justify-center items-center gap-1 sm:gap-2">
                 {/* Kekkon Logo */}
@@ -232,24 +239,39 @@ export default function InvitationPage() {
                 
                 <div className="w-px h-6 bg-gray-200 mr-1 sm:mr-2" />
                 
-                {navItems.map((section) => (
-                  <a
-                    key={section.id}
-                    href={`#${section.id}`}
-                    className="flex items-center gap-1.5 px-2 sm:px-3 py-2 rounded-full text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-all text-xs sm:text-sm"
-                    style={{ '--hover-color': invitation.primary_color }}
-                  >
-                    <section.icon className="w-4 h-4 flex-shrink-0" />
-                    <span className="hidden sm:inline">{section.label}</span>
-                  </a>
-                ))}
+                {navItems.map((section) => {
+                  const isActive = activeSection === section.id;
+                  return (
+                    <a
+                      key={section.id}
+                      href={`#${section.id}`}
+                      className={`flex items-center gap-1.5 px-2 sm:px-3 py-2 rounded-full transition-all text-xs sm:text-sm ${
+                        isActive 
+                          ? 'text-white shadow-md' 
+                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                      }`}
+                      style={isActive ? { backgroundColor: invitation.primary_color } : {}}
+                    >
+                      <section.icon className="w-4 h-4 flex-shrink-0" />
+                      <span className="hidden sm:inline">{section.label}</span>
+                    </a>
+                  );
+                })}
               </div>
             </div>
           </motion.nav>
 
           <main className={`font-${invitation.font_family || 'poppins'}`}>
             <HeroSection invitation={invitation} />
-            <CoupleSection invitation={invitation} />
+            <CoupleSection 
+              invitation={invitation} 
+              onPhotoClick={(photo, name) => setLightboxPhoto({ photo, name })}
+            />
+            
+            {/* Main Image 1 - After Couple Section */}
+            {invitation.main_image_1 && (
+              <MainImageSection invitation={invitation} imageUrl={invitation.main_image_1} position={1} />
+            )}
             
             {/* Ad after couple section */}
             <div className="py-4 bg-white">
@@ -257,6 +279,12 @@ export default function InvitationPage() {
             </div>
             
             <EventSection invitation={invitation} />
+            
+            {/* Main Image 2 - After Event Section */}
+            {invitation.main_image_2 && (
+              <MainImageSection invitation={invitation} imageUrl={invitation.main_image_2} position={2} />
+            )}
+            
             {hasGallery && (
               <GallerySection invitation={invitation} />
             )}
@@ -279,43 +307,18 @@ export default function InvitationPage() {
               <AdPlaceholder height="90px" className="max-w-4xl mx-auto px-4" />
             </div>
           </main>
+          
+          {/* Photo Lightbox */}
+          {lightboxPhoto && (
+            <PhotoLightbox
+              photo={lightboxPhoto.photo}
+              name={lightboxPhoto.name}
+              onClose={() => setLightboxPhoto(null)}
+            />
+          )}
         </>
       )}
     </div>
-  );
-}
-
-function GeometricShapes({ primaryColor }) {
-  return (
-    <>
-      <motion.div
-        initial={{ opacity: 0, x: -100 }}
-        animate={{ opacity: 0.15, x: 0 }}
-        transition={{ delay: 0.5 }}
-        className="absolute top-20 left-10 w-40 h-40 rounded-full"
-        style={{ backgroundColor: primaryColor }}
-      />
-      <motion.div
-        initial={{ opacity: 0, y: 100 }}
-        animate={{ opacity: 0.1, y: 0 }}
-        transition={{ delay: 0.7 }}
-        className="absolute bottom-20 right-10 w-60 h-60"
-        style={{
-          backgroundColor: primaryColor,
-          clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
-        }}
-      />
-      <motion.div
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: 0.1, scale: 1 }}
-        transition={{ delay: 0.9 }}
-        className="absolute top-40 right-20 w-32 h-32"
-        style={{
-          backgroundColor: primaryColor,
-          clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
-        }}
-      />
-    </>
   );
 }
 

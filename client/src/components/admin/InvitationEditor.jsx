@@ -50,6 +50,85 @@ const COLOR_PALETTES = [
   { name: 'Royal Purple', primary: '#7B68EE', secondary: '#E6E6FA', accent: '#9370DB' },
 ];
 
+// Minimalist SVG icons for wishlist
+const WishlistIcons = {
+  coffee_maker: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  bedcover: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <path d="M3 21V7a2 2 0 012-2h14a2 2 0 012 2v14M3 11h18M7 11v10M17 11v10" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  mug_set: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <path d="M17 8h1a4 4 0 110 8h-1M3 8h14v11a3 3 0 01-3 3H6a3 3 0 01-3-3V8zM7 3v2M11 3v2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  kitchen_set: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <circle cx="12" cy="12" r="9"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M7 7l1.5 1.5M15.5 15.5L17 17M7 17l1.5-1.5M15.5 8.5L17 7" strokeLinecap="round"/>
+    </svg>
+  ),
+  blender: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <path d="M8 2h8l-1 9H9L8 2zM6 11h12l-2 11H8L6 11zM10 15h4" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  rice_cooker: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <ellipse cx="12" cy="8" rx="8" ry="3"/><path d="M4 8v8c0 1.66 3.58 3 8 3s8-1.34 8-3V8M12 4V2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  vacuum: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <circle cx="12" cy="6" r="4"/><path d="M12 10v6M8 22h8M10 16l-2 6M14 16l2 6" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  iron: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <path d="M3 17h18l-3-9H8L3 17zM6 17v3M18 17v3M9 11h6" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  towel_set: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <path d="M4 4h16v4a2 2 0 01-2 2H6a2 2 0 01-2-2V4zM6 10v10a2 2 0 002 2h8a2 2 0 002-2V10" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  dinnerware: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>
+    </svg>
+  ),
+  air_fryer: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="12" cy="14" r="4"/><path d="M8 8h2M14 8h2" strokeLinecap="round"/>
+    </svg>
+  ),
+  mixer: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <circle cx="12" cy="8" r="5"/><path d="M9 13v6a3 3 0 006 0v-6M12 3v2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+};
+
+const WISHLIST_OPTIONS = [
+  { id: 'coffee_maker', name: 'Coffee Maker', Icon: WishlistIcons.coffee_maker },
+  { id: 'bedcover', name: 'Bedcover Set', Icon: WishlistIcons.bedcover },
+  { id: 'mug_set', name: 'Mug Set', Icon: WishlistIcons.mug_set },
+  { id: 'kitchen_set', name: 'Kitchen Set', Icon: WishlistIcons.kitchen_set },
+  { id: 'blender', name: 'Blender', Icon: WishlistIcons.blender },
+  { id: 'rice_cooker', name: 'Rice Cooker', Icon: WishlistIcons.rice_cooker },
+  { id: 'vacuum', name: 'Vacuum Cleaner', Icon: WishlistIcons.vacuum },
+  { id: 'iron', name: 'Setrika', Icon: WishlistIcons.iron },
+  { id: 'towel_set', name: 'Towel Set', Icon: WishlistIcons.towel_set },
+  { id: 'dinnerware', name: 'Dinnerware Set', Icon: WishlistIcons.dinnerware },
+  { id: 'air_fryer', name: 'Air Fryer', Icon: WishlistIcons.air_fryer },
+  { id: 'mixer', name: 'Mixer', Icon: WishlistIcons.mixer },
+];
+
 const FONTS = [
   { id: 'playfair', name: 'Playfair Display', style: 'Elegant Serif' },
   { id: 'cormorant', name: 'Cormorant', style: 'Classic Serif' },
@@ -75,6 +154,7 @@ export default function InvitationEditor() {
     primary_color: '#D4A373',
     secondary_color: '#FEFAE0',
     font_family: 'playfair',
+    custom_colors: null,
     is_muslim: true,
     bride_name: '',
     bride_parents: '',
@@ -84,6 +164,9 @@ export default function InvitationEditor() {
     groom_parents: '',
     groom_photo: '',
     groom_instagram: '',
+    main_image_1: '',
+    main_image_2: '',
+    home_image: '',
     wedding_date: '',
     akad_time: '',
     akad_venue: '',
@@ -101,6 +184,8 @@ export default function InvitationEditor() {
     gift_bank_accounts: [],
     gift_ewallets: [],
     gift_address: '',
+    gift_wishlist: [],
+    custom_wishlist: '',
     enable_rsvp: true,
     enable_messages: true,
     enable_countdown: true,
@@ -126,12 +211,17 @@ export default function InvitationEditor() {
     try {
       const res = await invitationAPI.getOne(id);
       const inv = res.data.invitation;
+      const wishlistData = inv.gift_wishlist || [];
+      const predefinedWishlist = wishlistData.filter(w => !w.startsWith('custom:'));
+      const customWishlistItems = wishlistData.filter(w => w.startsWith('custom:')).map(w => w.replace('custom:', ''));
+      
       setFormData(prev => ({
         ...prev,
         template_id: inv.template_id || 'geometric-modern',
         primary_color: inv.primary_color || '#D4A373',
         secondary_color: inv.secondary_color || '#FEFAE0',
         font_family: inv.font_family || 'playfair',
+        custom_colors: inv.custom_colors || null,
         is_muslim: inv.is_muslim !== undefined ? Boolean(inv.is_muslim) : true,
         bride_name: inv.bride_name || '',
         bride_parents: inv.bride_parents || '',
@@ -141,6 +231,9 @@ export default function InvitationEditor() {
         groom_parents: inv.groom_parents || '',
         groom_photo: inv.groom_photo || '',
         groom_instagram: inv.groom_instagram || '',
+        main_image_1: inv.main_image_1 || '',
+        main_image_2: inv.main_image_2 || '',
+        home_image: inv.home_image || '',
         wedding_date: inv.wedding_date ? inv.wedding_date.split('T')[0] : '',
         akad_time: inv.akad_time || '',
         akad_venue: inv.akad_venue || '',
@@ -158,6 +251,8 @@ export default function InvitationEditor() {
         gift_bank_accounts: inv.gift_bank_accounts || [],
         gift_ewallets: inv.gift_ewallets || [],
         gift_address: inv.gift_address || '',
+        gift_wishlist: predefinedWishlist,
+        custom_wishlist: customWishlistItems.join(', '),
         enable_rsvp: inv.enable_rsvp !== undefined ? inv.enable_rsvp : true,
         enable_messages: inv.enable_messages !== undefined ? inv.enable_messages : true,
         enable_countdown: inv.enable_countdown !== undefined ? inv.enable_countdown : true,
@@ -241,11 +336,23 @@ export default function InvitationEditor() {
   const handleSave = async () => {
     setSaving(true);
     try {
+      // Combine wishlist data
+      const customItems = formData.custom_wishlist
+        ? formData.custom_wishlist.split(',').map(s => s.trim()).filter(Boolean).map(s => `custom:${s}`)
+        : [];
+      const combinedWishlist = [...formData.gift_wishlist, ...customItems];
+      
+      const dataToSave = {
+        ...formData,
+        gift_wishlist: combinedWishlist,
+      };
+      delete dataToSave.custom_wishlist;
+      
       if (id) {
-        await invitationAPI.update(id, formData);
+        await invitationAPI.update(id, dataToSave);
         toast.success('Perubahan tersimpan');
       } else {
-        const res = await invitationAPI.create(formData);
+        const res = await invitationAPI.create(dataToSave);
         navigate(`/edit/${res.data.invitation.id}`, { replace: true });
         toast.success('Draft undangan dibuat');
       }
@@ -512,15 +619,20 @@ export default function InvitationEditor() {
                     Pilih Warna
                   </h3>
                   <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-                    {COLOR_PALETTES.map((p) => (
+                    {COLOR_PALETTES.map((p) => {
+                      const isSelected = formData.primary_color === p.primary && 
+                                        formData.secondary_color === p.secondary && 
+                                        !formData.custom_colors;
+                      return (
                       <button
                         key={p.name}
                         onClick={() => {
                           handleChange('primary_color', p.primary);
                           handleChange('secondary_color', p.secondary);
+                          handleChange('custom_colors', null);
                         }}
                         className={`flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl sm:rounded-2xl transition-all duration-300
-                          ${formData.primary_color === p.primary 
+                          ${isSelected
                             ? 'bg-gray-900 text-white shadow-lg' 
                             : 'bg-gray-50 hover:bg-gray-100'}`}
                       >
@@ -531,8 +643,93 @@ export default function InvitationEditor() {
                         </div>
                         <span className="text-xs sm:text-sm font-medium truncate">{p.name}</span>
                       </button>
-                    ))}
+                    );})}
+                    
+                    {/* Custom Color Palette */}
+                    <button
+                      onClick={() => {
+                        handleChange('custom_colors', {
+                          primary: formData.primary_color,
+                          secondary: formData.secondary_color,
+                          accent: formData.primary_color
+                        });
+                      }}
+                      className={`flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl sm:rounded-2xl transition-all duration-300
+                        ${formData.custom_colors
+                          ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg' 
+                          : 'bg-gray-50 hover:bg-gray-100 border-2 border-dashed border-gray-300'}`}
+                    >
+                      <div className="flex -space-x-1.5 sm:-space-x-2 flex-shrink-0">
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full ring-2 ring-white shadow bg-gradient-to-br from-purple-400 to-pink-400" />
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full ring-2 ring-white shadow bg-gradient-to-br from-blue-400 to-cyan-400" />
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full ring-2 ring-white shadow bg-gradient-to-br from-green-400 to-teal-400" />
+                      </div>
+                      <span className="text-xs sm:text-sm font-medium truncate">Custom</span>
+                    </button>
                   </div>
+
+                  {/* Custom Color Pickers */}
+                  {formData.custom_colors && (
+                    <div className="mt-6 p-5 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl">
+                      <h4 className="text-sm font-semibold text-gray-700 mb-4">Pilih Warna Custom</h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-medium text-gray-500 mb-2">Warna Primer</label>
+                          <div className="flex items-center gap-3">
+                            <input
+                              type="color"
+                              value={formData.primary_color}
+                              onChange={(e) => {
+                                handleChange('primary_color', e.target.value);
+                                handleChange('custom_colors', { ...formData.custom_colors, primary: e.target.value });
+                              }}
+                              className="w-12 h-12 rounded-xl cursor-pointer border-0"
+                            />
+                            <input
+                              type="text"
+                              value={formData.primary_color}
+                              onChange={(e) => {
+                                handleChange('primary_color', e.target.value);
+                                handleChange('custom_colors', { ...formData.custom_colors, primary: e.target.value });
+                              }}
+                              className="flex-1 px-3 py-2 bg-white rounded-lg text-sm font-mono"
+                              placeholder="#D4A373"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-500 mb-2">Warna Sekunder</label>
+                          <div className="flex items-center gap-3">
+                            <input
+                              type="color"
+                              value={formData.secondary_color}
+                              onChange={(e) => {
+                                handleChange('secondary_color', e.target.value);
+                                handleChange('custom_colors', { ...formData.custom_colors, secondary: e.target.value });
+                              }}
+                              className="w-12 h-12 rounded-xl cursor-pointer border-0"
+                            />
+                            <input
+                              type="text"
+                              value={formData.secondary_color}
+                              onChange={(e) => {
+                                handleChange('secondary_color', e.target.value);
+                                handleChange('custom_colors', { ...formData.custom_colors, secondary: e.target.value });
+                              }}
+                              className="flex-1 px-3 py-2 bg-white rounded-lg text-sm font-mono"
+                              placeholder="#FEFAE0"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-4 p-3 bg-white rounded-xl flex items-center gap-3">
+                        <span className="text-xs text-gray-500">Preview:</span>
+                        <div className="flex-1 h-8 rounded-lg" style={{ backgroundColor: formData.secondary_color }}>
+                          <div className="h-full w-1/2 rounded-lg" style={{ backgroundColor: formData.primary_color }} />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -717,6 +914,26 @@ export default function InvitationEditor() {
                       placeholder="@username"
                     />
                   </div>
+                </div>
+
+                {/* Main Image 1 - Full width */}
+                <div className="md:col-span-2 mt-6 pt-6 border-t border-gray-100">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center">
+                      <Image className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-800">Foto Utama 1 (Opsional)</h3>
+                      <p className="text-xs text-gray-500">Ditampilkan setelah section mempelai</p>
+                    </div>
+                  </div>
+                  <ImageUploader
+                    label="Upload Foto"
+                    currentImage={formData.main_image_1}
+                    onUpload={(file) => handleImageUpload(file, 'main_image_1')}
+                    onRemove={() => handleChange('main_image_1', '')}
+                    isUploading={uploadingImage === 'main_image_1'}
+                  />
                 </div>
               </div>
             )}
@@ -1010,12 +1227,56 @@ export default function InvitationEditor() {
                     </div>
                   </div>
                 </div>
+
+                {/* Main Image 2 - After address section */}
+                <div className="mt-10 pt-8 border-t border-gray-200">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-400 to-purple-400 flex items-center justify-center">
+                      <Image className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-800">Foto Utama 2 (Opsional)</h3>
+                      <p className="text-xs text-gray-500">Ditampilkan setelah section acara/alamat</p>
+                    </div>
+                  </div>
+                  <div className="max-w-md">
+                    <ImageUploader
+                      label="Upload Foto"
+                      currentImage={formData.main_image_2}
+                      onUpload={(file) => handleImageUpload(file, 'main_image_2')}
+                      onRemove={() => handleChange('main_image_2', '')}
+                      isUploading={uploadingImage === 'main_image_2'}
+                    />
+                  </div>
+                </div>
               </div>
             )}
 
             {/* Step 4: Konten */}
             {step === 4 && (
               <div className="space-y-10">
+                {/* Home Section Image */}
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-400 to-pink-400 flex items-center justify-center">
+                      <Heart className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-800">Foto Section Home (Opsional)</h3>
+                      <p className="text-xs text-gray-500">Foto pasangan bersama yang tampil di section countdown. Biasanya foto berdua yang romantis.</p>
+                    </div>
+                  </div>
+                  <div className="max-w-md">
+                    <ImageUploader
+                      label="Upload Foto Pasangan"
+                      currentImage={formData.home_image}
+                      onUpload={(file) => handleImageUpload(file, 'home_image')}
+                      onRemove={() => handleChange('home_image', '')}
+                      isUploading={uploadingImage === 'home_image'}
+                    />
+                  </div>
+                </div>
+
                 <div>
                   <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-4 flex items-center gap-2">
                     <Heart className="w-4 h-4 text-rose-400" />
@@ -1325,6 +1586,64 @@ export default function InvitationEditor() {
                     rows="3"
                     placeholder="Alamat lengkap untuk pengiriman hadiah fisik..."
                   />
+                </div>
+
+                {/* Wishlist */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <Gift className="w-4 h-4 text-purple-500" />
+                    Wishlist (Opsional)
+                  </h3>
+                  <p className="text-xs text-gray-500 mb-4">Pilih barang yang Anda inginkan sebagai hadiah pernikahan</p>
+                  
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6">
+                    {WISHLIST_OPTIONS.map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => {
+                          const current = formData.gift_wishlist || [];
+                          const newWishlist = current.includes(item.id)
+                            ? current.filter(w => w !== item.id)
+                            : [...current, item.id];
+                          handleChange('gift_wishlist', newWishlist);
+                        }}
+                        className={`p-3 rounded-xl text-center transition-all duration-200 border-2 ${
+                          (formData.gift_wishlist || []).includes(item.id)
+                            ? 'border-purple-500 bg-purple-50 shadow-md'
+                            : 'border-gray-200 bg-gray-50 hover:border-purple-300'
+                        }`}
+                      >
+                        <div className={`flex justify-center mb-1 ${
+                          (formData.gift_wishlist || []).includes(item.id) ? 'text-purple-600' : 'text-gray-500'
+                        }`}>
+                          <item.Icon />
+                        </div>
+                        <span className={`text-xs font-medium ${
+                          (formData.gift_wishlist || []).includes(item.id) ? 'text-purple-700' : 'text-gray-600'
+                        }`}>
+                          {item.name}
+                        </span>
+                        {(formData.gift_wishlist || []).includes(item.id) && (
+                          <Check className="w-4 h-4 text-purple-500 mx-auto mt-1" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-2">
+                      Wishlist Lainnya (pisahkan dengan koma)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.custom_wishlist}
+                      onChange={(e) => handleChange('custom_wishlist', e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:ring-2 focus:ring-purple-400 transition-all"
+                      placeholder="contoh: Panci Set, Frame Foto, Vas Bunga"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">Tambahkan item custom yang tidak ada di daftar</p>
+                  </div>
                 </div>
               </div>
             )}

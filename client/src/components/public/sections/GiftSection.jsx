@@ -1,7 +1,87 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Gift, Copy, Check, MapPin, CreditCard, Wallet } from 'lucide-react';
+import { Gift, Copy, Check, MapPin, CreditCard, Wallet, Heart } from 'lucide-react';
 import { FloralDivider, GoldAccent, FloralCorner } from '../decorations/Ornaments';
+import { ThemedDivider, getThemeDecorations } from '../decorations/ThemedDecorations';
+
+// Minimalist SVG icons for wishlist items
+const WishlistIcons = {
+  coffee_maker: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  bedcover: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <path d="M3 21V7a2 2 0 012-2h14a2 2 0 012 2v14M3 11h18M7 11v10M17 11v10" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  mug_set: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <path d="M17 8h1a4 4 0 110 8h-1M3 8h14v11a3 3 0 01-3 3H6a3 3 0 01-3-3V8zM7 3v2M11 3v2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  kitchen_set: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <circle cx="12" cy="12" r="9"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M7 7l1.5 1.5M15.5 15.5L17 17M7 17l1.5-1.5M15.5 8.5L17 7" strokeLinecap="round"/>
+    </svg>
+  ),
+  blender: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <path d="M8 2h8l-1 9H9L8 2zM6 11h12l-2 11H8L6 11zM10 15h4" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  rice_cooker: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <ellipse cx="12" cy="8" rx="8" ry="3"/><path d="M4 8v8c0 1.66 3.58 3 8 3s8-1.34 8-3V8M12 4V2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  vacuum: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <circle cx="12" cy="6" r="4"/><path d="M12 10v6M8 22h8M10 16l-2 6M14 16l2 6" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  iron: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <path d="M3 17h18l-3-9H8L3 17zM6 17v3M18 17v3M9 11h6" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  towel_set: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <path d="M4 4h16v4a2 2 0 01-2 2H6a2 2 0 01-2-2V4zM6 10v10a2 2 0 002 2h8a2 2 0 002-2V10" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  dinnerware: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>
+    </svg>
+  ),
+  air_fryer: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="12" cy="14" r="4"/><path d="M8 8h2M14 8h2" strokeLinecap="round"/>
+    </svg>
+  ),
+  mixer: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">
+      <circle cx="12" cy="8" r="5"/><path d="M9 13v6a3 3 0 006 0v-6M12 3v2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+};
+
+const WISHLIST_ITEMS = {
+  coffee_maker: { name: 'Coffee Maker', Icon: WishlistIcons.coffee_maker },
+  bedcover: { name: 'Bedcover Set', Icon: WishlistIcons.bedcover },
+  mug_set: { name: 'Mug Set', Icon: WishlistIcons.mug_set },
+  kitchen_set: { name: 'Kitchen Set', Icon: WishlistIcons.kitchen_set },
+  blender: { name: 'Blender', Icon: WishlistIcons.blender },
+  rice_cooker: { name: 'Rice Cooker', Icon: WishlistIcons.rice_cooker },
+  vacuum: { name: 'Vacuum Cleaner', Icon: WishlistIcons.vacuum },
+  iron: { name: 'Setrika', Icon: WishlistIcons.iron },
+  towel_set: { name: 'Towel Set', Icon: WishlistIcons.towel_set },
+  dinnerware: { name: 'Dinnerware Set', Icon: WishlistIcons.dinnerware },
+  air_fryer: { name: 'Air Fryer', Icon: WishlistIcons.air_fryer },
+  mixer: { name: 'Mixer', Icon: WishlistIcons.mixer },
+};
 
 // Bank Logos as SVG components
 const BankLogos = {
@@ -134,6 +214,8 @@ function CopyButton({ text, primaryColor }) {
 export default function GiftSection({ invitation }) {
   const primaryColor = invitation.primary_color || '#D4A373';
   const secondaryColor = invitation.secondary_color || '#FEFAE0';
+  const templateId = invitation.template_id || 'geometric-modern';
+  const theme = getThemeDecorations(templateId);
 
   const bankAccounts = invitation.gift_bank_accounts || [];
   const ewallets = invitation.gift_ewallets || [];
@@ -329,9 +411,60 @@ export default function GiftSection({ invitation }) {
           </motion.div>
         )}
 
+        {/* Wishlist Section */}
+        {invitation.gift_wishlist && invitation.gift_wishlist.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-10"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div 
+                className="w-10 h-10 rounded-xl flex items-center justify-center"
+                style={{ backgroundColor: `${primaryColor}20` }}
+              >
+                <Heart className="w-5 h-5" style={{ color: primaryColor }} />
+              </div>
+              <h3 className="font-semibold text-gray-800">Wishlist Kami</h3>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {invitation.gift_wishlist.map((item, index) => {
+                const isCustom = item.startsWith('custom:');
+                const itemData = isCustom 
+                  ? { name: item.replace('custom:', ''), Icon: null }
+                  : WISHLIST_ITEMS[item] || { name: item, Icon: null };
+                const ItemIcon = itemData.Icon;
+                
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.05 }}
+                    className="p-4 rounded-2xl text-center"
+                    style={{ backgroundColor: `${primaryColor}10` }}
+                  >
+                    <div className="flex justify-center mb-2" style={{ color: primaryColor }}>
+                      {ItemIcon ? <ItemIcon /> : <Gift className="w-6 h-6" />}
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">{itemData.name}</span>
+                  </motion.div>
+                );
+              })}
+            </div>
+            
+            <p className="text-center text-sm text-gray-500 mt-4 italic">
+              Jika berkenan, Anda dapat memberikan salah satu dari wishlist di atas
+            </p>
+          </motion.div>
+        )}
+
         {/* Divider */}
         <div className="mt-16">
-          <FloralDivider color={primaryColor} />
+          <ThemedDivider templateId={templateId} color={primaryColor} />
         </div>
       </div>
     </section>

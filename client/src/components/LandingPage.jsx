@@ -6,6 +6,12 @@ import { useAuth } from '../contexts/AuthContext';
 import { KekkonLogo, KekkonIcon } from './shared/Logo';
 import ThemeToggle from './shared/ThemeToggle';
 
+// Import actual SVG assets
+import StackedLeavesSvg from '../assets/svg/elegant-themed/stacked-leaves-2.svg';
+import StackedLeaves2Svg from '../assets/svg/elegant-themed/stacked-leaves.svg';
+import StackedLeaves3Svg from '../assets/svg/elegant-themed/stacked-leaves-3.svg';
+import CornerBorderSvg from '../assets/svg/elegant-themed/corner-border.svg';
+
 export default function LandingPage() {
   const { user } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -118,6 +124,80 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-4 relative overflow-hidden">
+        {/* Palm Tree-like Leaf Decorations - Left Side */}
+        <div className="absolute top-0 left-0 hidden lg:block pointer-events-none" style={{ height: '100%' }}>
+          {/* Main trunk/stem effect */}
+          <div className="absolute left-8 top-20 bottom-20 w-0.5 bg-gradient-to-b from-amber-300/20 via-amber-400/30 to-amber-300/10" />
+          
+          {/* Top leaves */}
+          <motion.div 
+            className="absolute top-16 left-0"
+            animate={{ rotate: [-3, 5, -3], y: [0, -5, 0] }}
+            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            <img src={StackedLeavesSvg} alt="" className="w-36 h-auto opacity-50" />
+          </motion.div>
+          
+          {/* Middle leaves */}
+          <motion.div 
+            className="absolute top-1/3 -left-4"
+            animate={{ rotate: [5, -5, 5], x: [0, 8, 0] }}
+            transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+          >
+            <img src={StackedLeaves2Svg} alt="" className="w-32 h-auto opacity-35" />
+          </motion.div>
+          
+          {/* Lower leaves */}
+          <motion.div 
+            className="absolute top-2/3 left-0"
+            animate={{ rotate: [-4, 6, -4], y: [0, 8, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+          >
+            <img src={StackedLeaves3Svg} alt="" className="w-28 h-auto opacity-25" />
+          </motion.div>
+        </div>
+        
+        {/* Palm Tree-like Leaf Decorations - Right Side (mirrored) */}
+        <div className="absolute top-0 right-0 hidden lg:block pointer-events-none" style={{ height: '100%' }}>
+          {/* Main trunk/stem effect */}
+          <div className="absolute right-8 top-20 bottom-20 w-0.5 bg-gradient-to-b from-amber-300/20 via-amber-400/30 to-amber-300/10" />
+          
+          {/* Top leaves */}
+          <motion.div 
+            className="absolute top-16 right-0"
+            animate={{ rotate: [3, -5, 3], y: [0, -5, 0] }}
+            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }}
+          >
+            <img src={StackedLeavesSvg} alt="" className="w-36 h-auto opacity-50" style={{ transform: 'scaleX(-1)' }} />
+          </motion.div>
+          
+          {/* Middle leaves */}
+          <motion.div 
+            className="absolute top-1/3 -right-4"
+            animate={{ rotate: [-5, 5, -5], x: [0, -8, 0] }}
+            transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
+          >
+            <img src={StackedLeaves2Svg} alt="" className="w-32 h-auto opacity-35" style={{ transform: 'scaleX(-1)' }} />
+          </motion.div>
+          
+          {/* Lower leaves */}
+          <motion.div 
+            className="absolute top-2/3 right-0"
+            animate={{ rotate: [4, -6, 4], y: [0, 8, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1.3 }}
+          >
+            <img src={StackedLeaves3Svg} alt="" className="w-28 h-auto opacity-25" style={{ transform: 'scaleX(-1)' }} />
+          </motion.div>
+        </div>
+        
+        {/* Corner Border Decorations */}
+        <div className="absolute top-20 left-4 hidden md:block pointer-events-none opacity-15">
+          <img src={CornerBorderSvg} alt="" className="w-20 h-auto" />
+        </div>
+        <div className="absolute top-20 right-4 hidden md:block pointer-events-none opacity-15">
+          <img src={CornerBorderSvg} alt="" className="w-20 h-auto" style={{ transform: 'scaleX(-1)' }} />
+        </div>
+        
         {/* Background decorations */}
         <div className="absolute top-20 -left-20 w-72 h-72 bg-amber-200/30 dark:bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-20 -right-20 w-72 sm:w-96 h-72 sm:h-96 bg-orange-200/30 dark:bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />

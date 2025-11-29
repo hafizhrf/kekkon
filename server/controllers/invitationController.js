@@ -60,6 +60,12 @@ export function getInvitation(req, res) {
     if (invitation.gift_ewallets) {
       invitation.gift_ewallets = JSON.parse(invitation.gift_ewallets);
     }
+    if (invitation.gift_wishlist) {
+      invitation.gift_wishlist = JSON.parse(invitation.gift_wishlist);
+    }
+    if (invitation.custom_colors) {
+      invitation.custom_colors = JSON.parse(invitation.custom_colors);
+    }
 
     res.json({ invitation });
   } catch (error) {
@@ -75,6 +81,7 @@ export function createInvitation(req, res) {
       primary_color,
       secondary_color,
       font_family,
+      custom_colors,
       is_muslim = 1,
       bride_name,
       bride_parents,
@@ -84,6 +91,9 @@ export function createInvitation(req, res) {
       groom_parents,
       groom_photo,
       groom_instagram,
+      main_image_1,
+      main_image_2,
+      home_image,
       wedding_date,
       akad_time,
       akad_venue,
@@ -102,6 +112,7 @@ export function createInvitation(req, res) {
       gift_bank_accounts,
       gift_ewallets,
       gift_address,
+      gift_wishlist,
       enable_rsvp = 1,
       enable_messages = 1,
       enable_countdown = 1,
@@ -111,8 +122,8 @@ export function createInvitation(req, res) {
     const slug = generateSlug(bride_name, groom_name);
 
     const invResult = db.prepare(`
-      INSERT INTO invitations (user_id, slug, template_id, primary_color, secondary_color, font_family, enable_rsvp, enable_messages, enable_countdown)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO invitations (user_id, slug, template_id, primary_color, secondary_color, font_family, custom_colors, enable_rsvp, enable_messages, enable_countdown)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       req.user.userId,
       slug,
@@ -120,6 +131,7 @@ export function createInvitation(req, res) {
       primary_color || '#D4A373',
       secondary_color || '#FEFAE0',
       font_family || 'playfair',
+      custom_colors ? JSON.stringify(custom_colors) : null,
       enable_rsvp ? 1 : 0,
       enable_messages ? 1 : 0,
       enable_countdown ? 1 : 0
@@ -131,11 +143,12 @@ export function createInvitation(req, res) {
       INSERT INTO invitation_content (
         invitation_id, is_muslim, bride_name, bride_parents, bride_photo, bride_instagram,
         groom_name, groom_parents, groom_photo, groom_instagram,
+        main_image_1, main_image_2, home_image,
         wedding_date, akad_time, akad_venue, akad_address, akad_lat, akad_lng,
         reception_time, reception_venue, reception_address, reception_lat, reception_lng,
         music_url, story_text, gallery_images, custom_fields,
-        gift_bank_accounts, gift_ewallets, gift_address, enable_gift
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        gift_bank_accounts, gift_ewallets, gift_address, gift_wishlist, enable_gift
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       invitationId,
       is_muslim ? 1 : 0,
@@ -147,6 +160,9 @@ export function createInvitation(req, res) {
       groom_parents || null,
       groom_photo || null,
       groom_instagram || null,
+      main_image_1 || null,
+      main_image_2 || null,
+      home_image || null,
       wedding_date,
       akad_time || null,
       akad_venue || null,
@@ -165,6 +181,7 @@ export function createInvitation(req, res) {
       gift_bank_accounts ? JSON.stringify(gift_bank_accounts) : null,
       gift_ewallets ? JSON.stringify(gift_ewallets) : null,
       gift_address || null,
+      gift_wishlist ? JSON.stringify(gift_wishlist) : null,
       enable_gift ? 1 : 0
     );
 
@@ -197,6 +214,7 @@ export function updateInvitation(req, res) {
       primary_color,
       secondary_color,
       font_family,
+      custom_colors,
       status,
       is_muslim,
       bride_name,
@@ -207,6 +225,9 @@ export function updateInvitation(req, res) {
       groom_parents,
       groom_photo,
       groom_instagram,
+      main_image_1,
+      main_image_2,
+      home_image,
       wedding_date,
       akad_time,
       akad_venue,
@@ -225,6 +246,7 @@ export function updateInvitation(req, res) {
       gift_bank_accounts,
       gift_ewallets,
       gift_address,
+      gift_wishlist,
       enable_rsvp,
       enable_messages,
       enable_countdown,
@@ -237,6 +259,7 @@ export function updateInvitation(req, res) {
         primary_color = COALESCE(?, primary_color),
         secondary_color = COALESCE(?, secondary_color),
         font_family = COALESCE(?, font_family),
+        custom_colors = COALESCE(?, custom_colors),
         status = COALESCE(?, status),
         enable_rsvp = COALESCE(?, enable_rsvp),
         enable_messages = COALESCE(?, enable_messages),
@@ -248,6 +271,7 @@ export function updateInvitation(req, res) {
       primary_color,
       secondary_color,
       font_family,
+      custom_colors ? JSON.stringify(custom_colors) : null,
       status,
       enable_rsvp !== undefined ? (enable_rsvp ? 1 : 0) : null,
       enable_messages !== undefined ? (enable_messages ? 1 : 0) : null,
@@ -266,6 +290,9 @@ export function updateInvitation(req, res) {
         groom_parents = COALESCE(?, groom_parents),
         groom_photo = COALESCE(?, groom_photo),
         groom_instagram = COALESCE(?, groom_instagram),
+        main_image_1 = COALESCE(?, main_image_1),
+        main_image_2 = COALESCE(?, main_image_2),
+        home_image = COALESCE(?, home_image),
         wedding_date = COALESCE(?, wedding_date),
         akad_time = COALESCE(?, akad_time),
         akad_venue = COALESCE(?, akad_venue),
@@ -284,6 +311,7 @@ export function updateInvitation(req, res) {
         gift_bank_accounts = COALESCE(?, gift_bank_accounts),
         gift_ewallets = COALESCE(?, gift_ewallets),
         gift_address = COALESCE(?, gift_address),
+        gift_wishlist = COALESCE(?, gift_wishlist),
         enable_gift = COALESCE(?, enable_gift)
       WHERE invitation_id = ?
     `).run(
@@ -296,6 +324,9 @@ export function updateInvitation(req, res) {
       groom_parents,
       groom_photo,
       groom_instagram,
+      main_image_1,
+      main_image_2,
+      home_image,
       wedding_date,
       akad_time,
       akad_venue,
@@ -314,6 +345,7 @@ export function updateInvitation(req, res) {
       gift_bank_accounts ? JSON.stringify(gift_bank_accounts) : null,
       gift_ewallets ? JSON.stringify(gift_ewallets) : null,
       gift_address,
+      gift_wishlist ? JSON.stringify(gift_wishlist) : null,
       enable_gift !== undefined ? (enable_gift ? 1 : 0) : null,
       id
     );
@@ -400,6 +432,12 @@ export function getPublicInvitation(req, res) {
     }
     if (invitation.gift_ewallets) {
       invitation.gift_ewallets = JSON.parse(invitation.gift_ewallets);
+    }
+    if (invitation.gift_wishlist) {
+      invitation.gift_wishlist = JSON.parse(invitation.gift_wishlist);
+    }
+    if (invitation.custom_colors) {
+      invitation.custom_colors = JSON.parse(invitation.custom_colors);
     }
 
     delete invitation.user_id;

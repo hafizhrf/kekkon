@@ -163,16 +163,17 @@ export function SplashReveal({ isOpen, onComplete, primaryColor = '#D4A373', sec
   );
 }
 
-// Opening Style 3: Envelope Reveal
+// Opening Style 3: Confetti Burst (for colorful-playful)
 export function EnvelopeReveal({ isOpen, onComplete, primaryColor = '#D4A373', secondaryColor = '#FEFAE0' }) {
   const [animationDone, setAnimationDone] = useState(false);
+  const colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3', '#F38181', '#AA96DA', '#FCBAD3'];
 
   useEffect(() => {
     if (isOpen && !animationDone) {
       const timer = setTimeout(() => {
         setAnimationDone(true);
         onComplete?.();
-      }, 2000);
+      }, 1500);
       return () => clearTimeout(timer);
     }
   }, [isOpen, animationDone, onComplete]);
@@ -181,45 +182,48 @@ export function EnvelopeReveal({ isOpen, onComplete, primaryColor = '#D4A373', s
 
   return (
     <motion.div
-      className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none"
+      className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none overflow-hidden"
       style={{ backgroundColor: secondaryColor }}
       initial={{ opacity: 1 }}
       animate={{ opacity: 0 }}
-      transition={{ duration: 0.5, delay: 1.5 }}
+      transition={{ duration: 0.4, delay: 1.1 }}
     >
-      <div className="relative w-72 h-48">
+      {/* Confetti particles */}
+      {[...Array(30)].map((_, i) => (
         <motion.div
-          className="absolute inset-0 rounded-lg shadow-2xl"
-          style={{ backgroundColor: primaryColor }}
-          initial={{ y: 0 }}
-          animate={{ y: 100, opacity: 0 }}
-          transition={{ duration: 0.5, delay: 1.2 }}
-        />
-        
-        <motion.div
-          className="absolute top-0 left-0 right-0 h-24 origin-top"
+          key={i}
+          className="absolute w-3 h-3 rounded-sm"
           style={{ 
-            backgroundColor: primaryColor,
-            clipPath: 'polygon(0 0, 50% 100%, 100% 0)',
-            filter: 'brightness(0.85)'
+            backgroundColor: colors[i % colors.length],
+            left: '50%',
+            top: '50%',
           }}
-          initial={{ rotateX: 0 }}
-          animate={{ rotateX: -180 }}
-          transition={{ duration: 0.6, delay: 0.3, ease: "easeInOut" }}
+          initial={{ x: 0, y: 0, scale: 0, rotate: 0 }}
+          animate={{ 
+            x: (Math.random() - 0.5) * 600,
+            y: (Math.random() - 0.5) * 600,
+            scale: [0, 1.5, 1],
+            rotate: Math.random() * 720 - 360,
+            opacity: [0, 1, 0],
+          }}
+          transition={{ 
+            duration: 1.2, 
+            delay: 0.1 + Math.random() * 0.3,
+            ease: "easeOut"
+          }}
         />
-        
-        <motion.div
-          className="absolute inset-3 rounded bg-white shadow-inner flex items-center justify-center"
-          initial={{ y: 0, opacity: 1 }}
-          animate={{ y: -80, opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.7 }}
-        >
-          <div className="text-center">
-            <Sparkles className="w-6 h-6 mx-auto mb-1" style={{ color: primaryColor }} />
-            <p className="text-sm font-medium" style={{ color: primaryColor }}>You're Invited!</p>
-          </div>
-        </motion.div>
-      </div>
+      ))}
+      
+      {/* Center burst */}
+      <motion.div
+        className="relative z-10 w-32 h-32 rounded-full flex items-center justify-center"
+        style={{ background: `linear-gradient(135deg, ${primaryColor}, #FF6B6B, #4ECDC4)` }}
+        initial={{ scale: 0 }}
+        animate={{ scale: [0, 1.2, 15], opacity: [1, 1, 0] }}
+        transition={{ duration: 1, times: [0, 0.4, 1], ease: "easeOut" }}
+      >
+        <Sparkles className="w-12 h-12 text-white" />
+      </motion.div>
     </motion.div>
   );
 }

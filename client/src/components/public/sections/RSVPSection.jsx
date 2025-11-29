@@ -6,6 +6,7 @@ import { Send, Check, MessageSquare, User, Users, Heart, X, CheckCircle } from '
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { FloralDivider, GoldAccent, FloralCorner } from '../decorations/Ornaments';
+import { getThemeDecorations } from '../decorations/ThemedDecorations';
 
 export default function RSVPSection({ invitation, guestName, slug }) {
   const [name, setName] = useState(guestName || '');

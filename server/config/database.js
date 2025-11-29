@@ -91,6 +91,8 @@ export function initializeDatabase() {
       groom_parents TEXT,
       groom_photo TEXT,
       groom_instagram TEXT,
+      main_image_1 TEXT,
+      main_image_2 TEXT,
       wedding_date TEXT NOT NULL,
       akad_time TEXT,
       akad_venue TEXT,
@@ -109,6 +111,7 @@ export function initializeDatabase() {
       gift_bank_accounts TEXT,
       gift_ewallets TEXT,
       gift_address TEXT,
+      gift_wishlist TEXT,
       enable_gift INTEGER DEFAULT 1,
       FOREIGN KEY (invitation_id) REFERENCES invitations(id) ON DELETE CASCADE
     );
@@ -165,6 +168,44 @@ export function initializeDatabase() {
     }
   } catch (err) {
     console.log('Migration check for expires_at:', err.message);
+  }
+
+  // Migration: Add custom_colors to invitations
+  try {
+    const tableInfo = db.prepare("PRAGMA table_info(invitations)").all();
+    const hasCustomColors = tableInfo.some(col => col.name === 'custom_colors');
+    if (!hasCustomColors) {
+      db.exec("ALTER TABLE invitations ADD COLUMN custom_colors TEXT");
+      console.log('Migration: Added custom_colors column to invitations');
+    }
+  } catch (err) {
+    console.log('Migration check for custom_colors:', err.message);
+  }
+
+  // Migration: Add main_image_1, main_image_2, gift_wishlist to invitation_content
+  try {
+    const tableInfo = db.prepare("PRAGMA table_info(invitation_content)").all();
+    const hasMainImage1 = tableInfo.some(col => col.name === 'main_image_1');
+    if (!hasMainImage1) {
+      db.exec("ALTER TABLE invitation_content ADD COLUMN main_image_1 TEXT");
+      db.exec("ALTER TABLE invitation_content ADD COLUMN main_image_2 TEXT");
+      db.exec("ALTER TABLE invitation_content ADD COLUMN gift_wishlist TEXT");
+      console.log('Migration: Added main_image_1, main_image_2, gift_wishlist to invitation_content');
+    }
+  } catch (err) {
+    console.log('Migration check for main images:', err.message);
+  }
+
+  // Migration: Add home_image to invitation_content
+  try {
+    const tableInfo = db.prepare("PRAGMA table_info(invitation_content)").all();
+    const hasHomeImage = tableInfo.some(col => col.name === 'home_image');
+    if (!hasHomeImage) {
+      db.exec("ALTER TABLE invitation_content ADD COLUMN home_image TEXT");
+      console.log('Migration: Added home_image to invitation_content');
+    }
+  } catch (err) {
+    console.log('Migration check for home_image:', err.message);
   }
 
   const templatesExist = db.prepare('SELECT COUNT(*) as count FROM templates').get();
