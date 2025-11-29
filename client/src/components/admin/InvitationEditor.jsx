@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
 import RichTextEditor from '../shared/RichTextEditor';
 import CustomSelect from '../shared/CustomSelect';
+import { motion } from 'framer-motion';
 
 const STEPS = [
   { id: 1, title: 'Template', desc: 'Pilih desain', icon: Palette },

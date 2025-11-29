@@ -1,4 +1,4 @@
-import {  AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Share2, Copy, MessageCircle, Download, X, User, QrCode, Check } from 'lucide-react';
 import { QRCodeSVG, QRCodeCanvas } from 'qrcode.react';
 import { useState, useRef } from 'react';

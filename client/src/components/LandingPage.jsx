@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import {  AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Users, Share2, Palette, Music, Check, ArrowRight, Star, LayoutDashboard, Menu, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { KekkonLogo, KekkonIcon } from './shared/Logo';

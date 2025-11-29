@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { motion, AnimatePresence } from 'framer-motion';
 import { publicAPI } from '../../../utils/api';
 import { Send, Check, MessageSquare, User, Users, Heart, X, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { FloralDivider, GoldAccent, FloralCorner } from '../decorations/Ornaments';
+import { getThemeDecorations } from '../decorations/ThemedDecorations';
 
 export default function RSVPSection({ invitation, guestName, slug }) {
   const [name, setName] = useState(guestName || '');
